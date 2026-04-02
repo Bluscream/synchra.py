@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synchra.py"
-version = "0.1.0"
+version = "0.1.1"
 description = "A modern, async-first Python SDK for the Synchra API v2.0."
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "Bluscream", email = "blu.pypi@minopia.de"},
+    {name = "Bluscream", email = "pypi@minopia.de"},
     {name = "Antigravity.AI", email = "antigravity@google.com" }
 ]
 requires-python = ">=3.9"
