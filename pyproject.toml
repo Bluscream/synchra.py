@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synchra.py"
-version = "0.1.1"
+version = "0.1.2"
 description = "A modern, async-first Python SDK for the Synchra API v2.0."
 readme = "README.md"
 license = {text = "MIT"}
@@ -15,7 +15,7 @@ authors = [
 requires-python = ">=3.9"
 dependencies = [
     "aiohttp>=3.9.0",
-    "pydantic>=2.5.0",
+    "pydantic>=2.5.0,<2.11",
     "websockets>=12.0"
 ]
 
@@ -30,7 +30,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["synchra*"]
+include = ["synchra_py*"]
 exclude = ["synchra_cli*", "tests*"]
 
 [tool.pytest.ini_options]
