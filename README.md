@@ -93,7 +93,7 @@ python -m pytest tests/
 
 ## Documentation
 
-For full API documentation and endpoint details, refer to the [Synchra OpenAPI Spec](https://api.synchra.net/api/2/docs).
+For full API documentation and endpoint details, refer to the [Synchra OpenAPI Spec](https://api.synchra.net/docs).
 
 ## License
 
