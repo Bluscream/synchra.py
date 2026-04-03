@@ -4,12 +4,14 @@ from uuid import UUID
 
 from .http import SynchraAuth, HTTPClient
 from .ws import SynchraWSClient
-from .api.channels import ChannelsAPI
-from .api.twitch import TwitchAPI
-from .api.youtube import YouTubeAPI
-from .api.kick import KickAPI
-from .api.user import UserAPI
-from .api.chat import ChatAPI
+from .api import (
+    ChannelsAPI,
+    TwitchAPI,
+    YouTubeAPI,
+    KickAPI,
+    UserAPI,
+    ChatAPI
+)
 
 logger = logging.getLogger("synchra")
 

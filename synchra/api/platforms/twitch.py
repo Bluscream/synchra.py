@@ -1,8 +1,8 @@
 from typing import List, Optional, Any
 from uuid import UUID
 
-from .base import APIGroup
-from ..models.platforms.twitch import (
+from ..base import APIGroup
+from ...models.platforms.twitch import (
     TwitchEmulateChatMessageRequest,
     TwitchBanRequest,
     TwitchRaidRequest,

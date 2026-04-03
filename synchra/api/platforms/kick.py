@@ -1,7 +1,7 @@
 from typing import List, Optional, Any
 from uuid import UUID
 
-from .base import APIGroup
+from ..base import APIGroup
 
 class KickAPI(APIGroup):
     """API for Kick-specific features in Synchra."""

@@ -1,8 +1,8 @@
 from typing import List, Optional
 from uuid import UUID
-from .base import APIGroup
-from ..models.platforms.youtube import LiveBroadcastInsert, YouTubeBanRequest
-from ..models.platforms.kick import KickBanRequest
+from ..base import APIGroup
+from ...models.platforms.youtube import LiveBroadcastInsert, YouTubeBanRequest
+from ...models.platforms.kick import KickBanRequest
 
 class YouTubeAPI(APIGroup):
     """API for YouTube-specific features in Synchra."""
