@@ -1,4 +1,6 @@
 from enum import Enum
+from pydantic import Field
+from ..base import SynchraBaseModel
 
 class KickActivityType(Enum):
     kick_sub = 'kick_sub'
@@ -32,3 +34,11 @@ class KickModActionSubType(Enum):
 class KickMessageSubType(Enum):
     first_message = 'first_message'
     returning_chatter = 'returning_chatter'
+
+class BodyBanUserApi2ChannelsChannelIdKickChannelProviderIdBanPost(SynchraBaseModel):
+    provider_viewer_id: str = Field(..., title='Provider Viewer Id')
+    duration_seconds: int | None = Field(None, title='Duration Seconds')
+    reason: str | None = Field(None, title='Reason')
+
+# Aliases for cleaner usage
+KickBanUserRequest = BodyBanUserApi2ChannelsChannelIdKickChannelProviderIdBanPost
