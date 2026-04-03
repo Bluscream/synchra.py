@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synchra.py"
-version = "0.1.4"
+version = "0.1.7"
 description = "A modern, async-first Python SDK for the Synchra API v2.0."
 readme = "README.md"
 license = {text = "MIT"}
