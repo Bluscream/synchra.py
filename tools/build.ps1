@@ -40,7 +40,6 @@ function Bump-Version {
 # Function to update version in pyproject.toml
 function Update-Version {
     param([string]$newVersion)
-    $pyprojectPath = "..\pyproject.toml"
     if (Test-Path $pyprojectPath) {
         $content = Get-Content $pyprojectPath
         $newContent = $content | ForEach-Object {
