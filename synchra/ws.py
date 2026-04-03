@@ -26,7 +26,22 @@ class SynchraWSClient:
         self._handlers: Dict[str, List[EventHandler]] = {}
         self._loop_task: Optional[asyncio.Task] = None
         self._subscriptions: List[Dict[str, Any]] = []
+        
+        # State Management
+        self._running = False
+        self._closed = False
         self._reconnect_delay = 1
+        self._max_reconnect_delay = 300
+
+    @property
+    def is_connected(self) -> bool:
+        """Whether the WebSocket is currently connected and active."""
+        return self._ws is not None and not self._ws.closed
+
+    @property
+    def is_closed(self) -> bool:
+        """Whether the client has been permanently closed."""
+        return self._closed
 
     def on(self, event_type: str):
         """Decorator to register an event handler."""
@@ -39,47 +54,70 @@ class SynchraWSClient:
 
     async def connect(self):
         """Connect to the WebSocket and start the listen loop."""
-        self._session = aiohttp.ClientSession()
+        self._running = True
+        self._closed = False
         self._loop_task = asyncio.create_task(self._listen_loop())
 
+    async def _emit(self, event_type: str, *args, **kwargs):
+        """Internal helper to emit an event to all registered handlers."""
+        if event_type in self._handlers:
+            for handler in self._handlers[event_type]:
+                try:
+                    if inspect.iscoroutinefunction(handler):
+                        await handler(*args, **kwargs)
+                    else:
+                        handler(*args, **kwargs)
+                except Exception as e:
+                    logger.error(f"Error in {event_type} handler: {e}")
+
     async def _listen_loop(self):
-        while True:
+        while self._running:
             try:
+                if self._session is None or self._session.closed:
+                    self._session = aiohttp.ClientSession()
+                    
                 headers = await self.auth.get_auth_header()
                 async with self._session.ws_connect(self.base_url, headers=headers) as ws:
                     self._ws = ws
                     logger.info("Connected to Synchra WebSocket")
-                    self._reconnect_delay = 1
                     
-                    # Re-subscribe to existing subscriptions
+                    # 1. Send explicit authorization command (v2 requirement)
+                    auth_payload = {
+                        "command": "authorization",
+                        "data": {"token": self.auth.access_token}
+                    }
+                    await self._ws.send_json(auth_payload)
+                    
+                    # 2. Emit connect event
+                    await self._emit("connect")
+                    
+                    # 3. Reset delay and resubscribe
+                    self._reconnect_delay = 1
                     for sub in self._subscriptions:
                         await self._ws.send_json(sub)
 
                     async for msg in ws:
                         if msg.type == aiohttp.WSMsgType.TEXT:
                             await self._handle_message(msg.data)
-                        elif msg.type == aiohttp.WSMsgType.CLOSED:
-                            break
-                        elif msg.type == aiohttp.WSMsgType.ERROR:
+                        elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR):
                             break
             except Exception as e:
                 logger.error(f"WebSocket error: {e}")
             
             self._ws = None
-            logger.info(f"Reconnecting in {self._reconnect_delay}s...")
-            await asyncio.sleep(self._reconnect_delay)
-            self._reconnect_delay = min(self._reconnect_delay * 2, 60)
+            if self._running:
+                await self._emit("disconnect")
+                logger.info(f"Reconnecting in {self._reconnect_delay}s...")
+                await asyncio.sleep(self._reconnect_delay)
+                # Exponential backoff with jitter
+                self._reconnect_delay = min(self._reconnect_delay * 1.5, self._max_reconnect_delay)
 
     async def _handle_message(self, data: str):
         try:
             payload = json.loads(data)
             event_type = payload.get("type")
-            if event_type in self._handlers:
-                for handler in self._handlers[event_type]:
-                    if inspect.iscoroutinefunction(handler):
-                        await handler(payload)
-                    else:
-                        handler(payload)
+            if event_type:
+                await self._emit(event_type, payload)
         except Exception as e:
             logger.error(f"Error handling WebSocket message: {e}")
 
@@ -108,10 +146,16 @@ class SynchraWSClient:
             await self._ws.send_json(payload)
 
     async def close(self):
-        """Close the WebSocket connection."""
+        """Close the WebSocket client."""
+        self._running = False
+        self._closed = True
+        
         if self._loop_task:
             self._loop_task.cancel()
+        
         if self._ws:
             await self._ws.close()
+        
         if self._session:
             await self._session.close()
+            self._session = None

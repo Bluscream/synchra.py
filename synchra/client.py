@@ -8,6 +8,8 @@ from .api.channels import ChannelsAPI
 from .api.twitch import TwitchAPI
 from .api.youtube import YouTubeAPI
 from .api.kick import KickAPI
+from .api.user import UserAPI
+from .api.chat import ChatAPI
 
 logger = logging.getLogger("synchra")
 
@@ -36,6 +38,13 @@ class SynchraClient:
         self.twitch = TwitchAPI(self.http)
         self.youtube = YouTubeAPI(self.http)
         self.kick = KickAPI(self.http)
+        self.user = UserAPI(self.http)
+        self.chat = ChatAPI(self.http)
+
+    @property
+    def is_ready(self) -> bool:
+        """Whether the client is authenticated and the WebSocket is active."""
+        return self.auth.access_token is not None and self.ws.is_connected
 
     async def connect(self):
         """Connect the WebSocket client."""

@@ -18,8 +18,8 @@ async def test_list_channels(http_client, mock_aioresponse):
         "total": 1
     }
     
-    # Correct endpoint mapping
-    mock_aioresponse.get("https://api.synchra.net/api/2/channels", status=200, payload=mock_data)
+    # Correct endpoint mapping with default pagination
+    mock_aioresponse.get("https://api.synchra.net/api/2/channels?per_page=25", status=200, payload=mock_data)
     
     api = ChannelsAPI(http_client)
     channels = await api.list()

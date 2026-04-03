@@ -50,10 +50,8 @@ class SynchraAuth:
     async def refresh(self):
         """Refreshes the access token using the refresh token."""
         if not self.refresh_token or not self.client_id or not self.client_secret:
-            raise SynchraError("Missing credentials for token refresh")
+            raise SynchraError("Missing credentials for token refresh (ID, Secret, or Refresh Token)")
         
-        # Implementation of OAuth2 refresh flow
-        # This is a placeholder until the exact endpoint is confirmed
         async with aiohttp.ClientSession() as session:
             payload = {
                 "grant_type": "refresh_token",
@@ -61,14 +59,18 @@ class SynchraAuth:
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
             }
-            async with session.post(self.token_url, data=payload) as resp:
-                if resp.status != 200:
-                    text = await resp.text()
-                    raise SynchraError(f"Failed to refresh token: {text}", status=resp.status)
-                
-                data = await resp.json()
-                self.access_token = data.get("access_token")
-                self.refresh_token = data.get("refresh_token") or self.refresh_token
+            try:
+                async with session.post(self.token_url, data=payload) as resp:
+                    if resp.status != 200:
+                        text = await resp.text()
+                        raise SynchraError(f"OAuth Refresh failed ({resp.status}): {text}", status=resp.status)
+                    
+                    data = await resp.json()
+                    self.access_token = data.get("access_token")
+                    self.refresh_token = data.get("refresh_token") or self.refresh_token
+            except Exception as e:
+                logger.error(f"Error during token refresh: {e}")
+                raise
 
 class HTTPClient:
     """Low-level HTTP client for Synchra API."""
