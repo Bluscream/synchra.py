@@ -10,21 +10,20 @@ from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel
 
+class AccessLevel(IntEnum):
+    GUEST = 0
+    SUB = 1
+    VIP = 2
+    MOD = 7
+    EDITOR = 100
+    ADMIN = 200
+    OWNER = 500
+    GLOBAL_ADMIN = 1000
 
-class Provider(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
+class ProviderList(RootModel[list[Provider | Literal['all']]]):
+    root: list[Provider | Literal['all']] = Field(..., title='Provider')
 
-
-class Type(Enum):
+class TwitchActivityType(Enum):
     sub = 'sub'
     resub = 'resub'
     sub_gift = 'sub_gift'
@@ -37,23 +36,20 @@ class Type(Enum):
     twitch_shoutout = 'twitch_shoutout'
     twitch_watch_streak = 'twitch_watch_streak'
 
-
-class Type1(Enum):
+class YouTubeActivityType(Enum):
     new_sponsor_event = 'newSponsorEvent'
     super_chat_event = 'superChatEvent'
     super_sticker_event = 'superStickerEvent'
     membership_gifting_event = 'membershipGiftingEvent'
     member_milestone_chat_event = 'memberMilestoneChatEvent'
 
-
-class Type2(Enum):
+class TikTokActivityType(Enum):
     tiktok_gift = 'tiktok_gift'
     tiktok_follow = 'tiktok_follow'
     tiktok_share = 'tiktok_share'
     tiktok_like = 'tiktok_like'
 
-
-class Type3(Enum):
+class KickActivityType(Enum):
     kick_sub = 'kick_sub'
     kick_resub = 'kick_resub'
     kick_gift_subs = 'kick_gift_subs'
@@ -62,28 +58,24 @@ class Type3(Enum):
     kick_kicks_gift = 'kick_kicks_gift'
     kick_reward_redemption = 'kick_reward_redemption'
 
-
 class SubType(Enum):
     prime = 'prime'
     field_1000 = '1000'
     field_2000 = '2000'
     field_3000 = '3000'
 
-
 class GiftedViewer(BaseModel):
     user_id: str = Field(..., title='User Id')
     username: str = Field(..., title='Username')
     display_name: str = Field(..., title='Display Name')
 
-
-class Type4(Enum):
+class MessagePartType(Enum):
     text = 'text'
     emote = 'emote'
     mention = 'mention'
     gift = 'gift'
     date = 'date'
     link = 'link'
-
 
 class CountCurrency(Enum):
     aed = 'AED'
@@ -265,7 +257,6 @@ class CountCurrency(Enum):
     zmw = 'ZMW'
     zwg = 'ZWG'
 
-
 class Gift(BaseModel):
     id: str = Field(..., title='Id')
     name: str = Field(..., title='Name')
@@ -276,12 +267,10 @@ class Gift(BaseModel):
     animated: bool | None = Field(False, title='Animated')
     image_url: str | None = Field(None, title='Image Url')
 
-
 class Urls(BaseModel):
     sm: str = Field(..., title='Sm')
     md: str = Field(..., title='Md')
     lg: str = Field(..., title='Lg')
-
 
 class Emote(BaseModel):
     id: str = Field(..., title='Id')
@@ -290,22 +279,19 @@ class Emote(BaseModel):
     emote_provider: str = Field(..., title='Emote Provider')
     urls: Urls | None
 
-
 class Mention(BaseModel):
     user_id: str = Field(..., title='User Id')
     username: str = Field(..., title='Username')
     display_name: str = Field(..., title='Display Name')
 
-
 class MessagePart(BaseModel):
-    type: Type4 = Field(..., title='Type')
+    type: MessagePartType = Field(..., title='Type')
     text: str = Field(..., title='Text')
     gift: Gift | None = None
     emote: Emote | None = None
     mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
-
 
 class Activity(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -317,10 +303,10 @@ class Activity(BaseModel):
     viewer_name: str = Field(..., title='Viewer Name')
     viewer_display_name: str = Field(..., title='Viewer Display Name')
     type: (
-        Type
-        | Type1
-        | Type2
-        | Type3
+        TwitchActivityType
+        | YouTubeActivityType
+        | TikTokActivityType
+        | KickActivityType
         | Literal['streamelements_tip']
         | Literal['streamlabs_donation']
         | str
@@ -341,8 +327,7 @@ class Activity(BaseModel):
     type_display_name: str = Field(..., title='Type Display Name')
     sub_type_display_name: str = Field(..., title='Sub Type Display Name')
 
-
-class Name(Enum):
+class TwitchActivityName(Enum):
     sub = 'sub'
     resub = 'resub'
     sub_gift = 'sub_gift'
@@ -355,23 +340,20 @@ class Name(Enum):
     twitch_shoutout = 'twitch_shoutout'
     twitch_watch_streak = 'twitch_watch_streak'
 
-
-class Name1(Enum):
+class YouTubeActivityName(Enum):
     new_sponsor_event = 'newSponsorEvent'
     super_chat_event = 'superChatEvent'
     super_sticker_event = 'superStickerEvent'
     membership_gifting_event = 'membershipGiftingEvent'
     member_milestone_chat_event = 'memberMilestoneChatEvent'
 
-
-class Name2(Enum):
+class TikTokActivityName(Enum):
     tiktok_gift = 'tiktok_gift'
     tiktok_follow = 'tiktok_follow'
     tiktok_share = 'tiktok_share'
     tiktok_like = 'tiktok_like'
 
-
-class Name3(Enum):
+class KickActivityName(Enum):
     kick_sub = 'kick_sub'
     kick_resub = 'kick_resub'
     kick_gift_subs = 'kick_gift_subs'
@@ -380,13 +362,12 @@ class Name3(Enum):
     kick_kicks_gift = 'kick_kicks_gift'
     kick_reward_redemption = 'kick_reward_redemption'
 
-
 class ActivityTypeName(BaseModel):
     name: (
-        Name
-        | Name1
-        | Name2
-        | Name3
+        TwitchActivityName
+        | YouTubeActivityName
+        | TikTokActivityName
+        | KickActivityName
         | Literal['streamelements_tip']
         | Literal['streamlabs_donation']
     ) = Field(..., title='Name')
@@ -398,17 +379,14 @@ class ActivityTypeName(BaseModel):
     filter_min_count: bool | None = Field(False, title='Filter Min Count')
     sub_type_names: dict[str, str] | None = Field(None, title='Sub Type Names')
 
-
 class ActivityUpdate(BaseModel):
     gifted_viewers: list[GiftedViewer] | None = Field(None, title='Gifted Viewers')
     read: bool | None = Field(None, title='Read')
     count: int | None = Field(None, title='Count')
 
-
-class Type5(Enum):
+class BannedTermType(Enum):
     phrase = 'phrase'
     regex = 'regex'
-
 
 class BannedTerm(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -416,65 +394,52 @@ class BannedTerm(BaseModel):
     type: Type5 = Field(..., title='Type')
     text: str = Field(..., title='Text')
 
-
 class BannedTermCreate(BaseModel):
-    type: Type5 = Field(..., title='Type')
+    type: BannedTermType = Field(..., title='Type')
     text: str = Field(..., max_length=2000, min_length=1, title='Text')
-
 
 class BannedTermTest(BaseModel):
     message: str = Field(..., max_length=2000, min_length=1, title='Message')
 
-
 class Text(RootModel[str]):
     root: str = Field(..., max_length=2000, min_length=1, title='Text')
 
-
 class BannedTermUpdate(BaseModel):
-    type: Type5 | None = Field(None, title='Type')
+    type: BannedTermType | None = Field(None, title='Type')
     text: Text | None = Field(None, title='Text')
-
 
 class BodyAddVIPUserApi2ChannelsChannelIdTwitchChannelProviderIdVipsPost(BaseModel):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
-
 
 class BodyBanUserApi2ChannelsChannelIdKickChannelProviderIdBanPost(BaseModel):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     duration_seconds: int | None = Field(None, title='Duration Seconds')
     reason: str | None = Field(None, title='Reason')
 
-
 class BodyBanUserApi2ChannelsChannelIdTwitchChannelProviderIdBanPost(BaseModel):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     duration_seconds: int | None = Field(None, title='Duration Seconds')
     reason: str | None = Field(None, title='Reason')
-
 
 class BodyBanUserApi2ChannelsChannelIdTwitchChannelProviderIdModeratorsDelete(
     BaseModel
 ):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
 
-
 class BodyBanUserApi2ChannelsChannelIdTwitchChannelProviderIdModeratorsPost(BaseModel):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
-
 
 class BodyBanUserApi2ChannelsChannelIdYoutubeChannelProviderIdBanPost(BaseModel):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     duration_seconds: int | None = Field(None, title='Duration Seconds')
-
 
 class BodyBanUserApi2ChannelsChannelIdYoutubeChannelProviderIdModeratorsDelete(
     BaseModel
 ):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
 
-
 class BodyBanUserApi2ChannelsChannelIdYoutubeChannelProviderIdModeratorsPost(BaseModel):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
-
 
 class RewardType(Enum):
     single_message_bypass_sub_mode = 'single_message_bypass_sub_mode'
@@ -486,7 +451,6 @@ class RewardType(Enum):
     gigantify_an_emote = 'gigantify_an_emote'
     celebration = 'celebration'
 
-
 class BodyEmulateAutomaticRewardRedemptionApi2TwitchEventsubEmulateAutomaticRewardRedemptionPost(
     BaseModel
 ):
@@ -494,49 +458,30 @@ class BodyEmulateAutomaticRewardRedemptionApi2TwitchEventsubEmulateAutomaticRewa
     user_input: str | None = Field('', title='User Input')
     reward_cost: int | None = Field(100, title='Reward Cost')
 
-
-class Type8(Enum):
+class TwitchCheerFragmentType(Enum):
     text = 'text'
     cheermote = 'cheermote'
     emote = 'emote'
     mention = 'mention'
-
 
 class Cheermote(BaseModel):
     prefix: str = Field(..., title='Prefix')
     bits: int = Field(..., title='Bits')
     tier: int = Field(..., title='Tier')
 
-
 class Format(Enum):
     animated = 'animated'
     static = 'static'
 
-
-class Emote1(BaseModel):
-    id: str = Field(..., title='Id')
-    emote_set_id: str = Field(..., title='Emote Set Id')
-    owner_id: str | None = Field('', title='Owner Id')
-    format: list[Format | str] | None = Field(['static'], title='Format')
-
-
-class Mention1(BaseModel):
-    user_id: str = Field(..., title='User Id')
-    user_name: str = Field(..., title='User Name')
-    user_login: str = Field(..., title='User Login')
-
-
 class Fragment(BaseModel):
-    type: Type8 | str = Field(..., title='Type')
+    type: TwitchCheerFragmentType | str = Field(..., title='Type')
     text: str = Field(..., title='Text')
     cheermote: Cheermote | None = None
-    emote: Emote1 | None = None
-    mention: Mention1 | None = None
-
+    emote: Emote | None = None
+    mention: Mention | None = None
 
 class Cheer(BaseModel):
     bits: int = Field(..., title='Bits')
-
 
 class MessageType(Enum):
     text = 'text'
@@ -548,7 +493,6 @@ class MessageType(Enum):
     power_ups_gigantified_emote = 'power_ups_gigantified_emote'
     first_message = 'first_message'
     returning_chatter = 'returning_chatter'
-
 
 class BodyEmulateChannelChatMessageApi2TwitchEventsubEmulateChannelChatMessagePost(
     BaseModel
@@ -563,34 +507,29 @@ class BodyEmulateChannelChatMessageApi2TwitchEventsubEmulateChannelChatMessagePo
         None, title='Source Provider Channel Name'
     )
 
-
-class Type9(Enum):
+class ChatEventType(Enum):
     poll = 'poll'
     progress = 'progress'
     countdown = 'countdown'
     notice = 'notice'
-
 
 class PollChoice(BaseModel):
     provider_choice_id: str = Field(..., title='Provider Choice Id')
     text: str = Field(..., title='Text')
     votes: int | None = Field(0, title='Votes')
 
-
-class Action(Enum):
+class ChatEventAction(Enum):
     new = 'new'
     updated = 'updated'
     deleted = 'deleted'
 
-
-class Status(Enum):
+class ChatEventStatus(Enum):
     open = 'open'
     locked = 'locked'
     completed = 'completed'
     terminated = 'terminated'
     archived = 'archived'
     unknown = 'unknown'
-
 
 class BodyEmulateChatEventProgressApi2ChannelsChannelIdChatEventsEmulateProgressPost(
     BaseModel
@@ -610,7 +549,6 @@ class BodyEmulateChatEventProgressApi2ChannelsChannelIdChatEventsEmulateProgress
     action: Action | None = Field('new', title='Action')
     status: Status | None = Field('open', title='Status')
 
-
 class BodyEmulateCustomRewardRedemptionApi2TwitchEventsubEmulateCustomRewardRedemptionPost(
     BaseModel
 ):
@@ -618,38 +556,31 @@ class BodyEmulateCustomRewardRedemptionApi2TwitchEventsubEmulateCustomRewardRede
     user_input: str | None = Field('', title='User Input')
     reward_cost: int | None = Field(100, title='Reward Cost')
 
-
 class BodyEmulateCheerApi2TwitchEventsubEmulateCheerPost(BaseModel):
     bits: int | None = Field(1500, title='Bits')
-
 
 class BodyMoveViewerToTopOfQueueApi2ChannelsChannelIdQueuesChannelQueueIdMoveToTopPut(
     BaseModel
 ):
     channel_queue_viewer_id: UUID = Field(..., title='Channel Queue Viewer Id')
 
-
 class BodyRaidChannelApi2ChannelsChannelIdTwitchChannelProviderIdRaidPost(BaseModel):
     to_provider_channel_id: str = Field(..., title='To Provider Channel Id')
-
 
 class BodyRegisterStreamElementsChannelProviderApi2ChannelsChannelIdRegisterProviderStreamelementsPost(
     BaseModel
 ):
     jwt_token: str = Field(..., title='Jwt Token')
 
-
 class BodyRemoveVIPUserApi2ChannelsChannelIdTwitchChannelProviderIdVipsDelete(
     BaseModel
 ):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
 
-
 class BodyShoutoutUserApi2ChannelsChannelIdTwitchChannelProviderIdShoutoutPost(
     BaseModel
 ):
     to_provider_channel_id: str = Field(..., title='To Provider Channel Id')
-
 
 class BodyStartCommercialApi2ChannelsChannelIdProvidersChannelProviderIdRunCommercialPost(
     BaseModel
@@ -662,29 +593,15 @@ class BodyStartCommercialApi2ChannelsChannelIdProvidersChannelProviderIdRunComme
         title='Length',
     )
 
-
-class AccessLevel(IntEnum):
-    GUEST = 0
-    USER = 1
-    LEVEL_2 = 2
-    MOD = 7
-    EDITOR = 100
-    ADMIN = 200
-    SUPER_ADMIN = 500
-    OWNER = 1000
-
-
 class BodyUpdateChannelUserAccessLevelApi2ChannelsChannelIdUsersAccessChannelUserAccessIdPut(
     BaseModel
 ):
-    access_level: AccessLevel = Field(..., title='TAccessLevel')
-
+    access_level: AccessLevel = Field(..., title='AccessLevel')
 
 class BodyRegisterTiktokUsernameRouteApi2ChannelsChannelIdRegisterProviderTiktokPost(
     BaseModel
 ):
     username: str = Field(..., max_length=200, min_length=1, title='Username')
-
 
 class Action1(Enum):
     reload = 'reload'
@@ -695,12 +612,10 @@ class Action1(Enum):
     play_next = 'playNext'
     skip = 'skip'
 
-
 class BodySeAlertsActionRouteApi2ChannelsChannelIdProvidersChannelProviderIdStreamelementsAlertsActionPut(
     BaseModel
 ):
     action: Action1 = Field(..., title='Action')
-
 
 class BotProviderPublic(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -710,17 +625,14 @@ class BotProviderPublic(BaseModel):
     name: str | None = Field(..., title='Name')
     scope_needed: bool = Field(..., title='Scope Needed')
 
-
 class Subscription(Enum):
     pro_plus = 'pro_plus'
-
 
 class UserAccessLevel(BaseModel):
     id: UUID = Field(..., title='Id')
     user_id: UUID = Field(..., title='User Id')
     channel_id: UUID = Field(..., title='Channel Id')
-    access_level: AccessLevel = Field(..., title='TAccessLevel')
-
+    access_level: AccessLevel = Field(..., title='AccessLevel')
 
 class BotProvider(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -729,7 +641,6 @@ class BotProvider(BaseModel):
     scope: str | None = Field(..., title='Scope')
     name: str | None = Field(..., title='Name')
     scope_needed: bool = Field(..., title='Scope Needed')
-
 
 class ChannelProvider(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -756,10 +667,8 @@ class ChannelProvider(BaseModel):
     bot_provider: BotProvider | None
     scope_needed: bool = Field(..., title='Scope Needed')
 
-
 class Feature(Enum):
     channel_viewer_extra_stats = 'channel_viewer_extra_stats'
-
 
 class Channel(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -769,20 +678,17 @@ class Channel(BaseModel):
     show_on_landing_page: bool | None = Field(False, title='Show On Landing Page')
     user_access_level: UserAccessLevel | None = None
     channel_providers: list[ChannelProvider] | None = Field(
-        None, title='Channel Providers'
+        None, title='Channel Provider'
     )
     features: list[Feature] = Field(..., title='Features')
 
-
 class ChannelChatMessageCheer(BaseModel):
     bits: int = Field(..., title='Bits')
-
 
 class ChannelChatMessageCheermote(BaseModel):
     prefix: str = Field(..., title='Prefix')
     bits: int = Field(..., title='Bits')
     tier: int = Field(..., title='Tier')
-
 
 class ChannelChatMessageEmote(BaseModel):
     id: str = Field(..., title='Id')
@@ -790,43 +696,30 @@ class ChannelChatMessageEmote(BaseModel):
     owner_id: str | None = Field('', title='Owner Id')
     format: list[Format | str] | None = Field(['static'], title='Format')
 
-
-class Type10(Enum):
+class TwitchMessagePartType(Enum):
     text = 'text'
     cheermote = 'cheermote'
     emote = 'emote'
     mention = 'mention'
 
-
-class Emote2(BaseModel):
-    id: str = Field(..., title='Id')
-    emote_set_id: str = Field(..., title='Emote Set Id')
-    owner_id: str | None = Field('', title='Owner Id')
-    format: list[Format | str] | None = Field(['static'], title='Format')
-
-
 class ChannelChatMessageFragment(BaseModel):
-    type: Type10 | str = Field(..., title='Type')
+    type: TwitchMessagePartType | str = Field(..., title='Type')
     text: str = Field(..., title='Text')
     cheermote: Cheermote | None = None
-    emote: Emote2 | None = None
-    mention: Mention1 | None = None
-
+    emote: Emote | None = None
+    mention: Mention | None = None
 
 class ChannelChatMessageMention(BaseModel):
     user_id: str = Field(..., title='User Id')
     user_name: str = Field(..., title='User Name')
     user_login: str = Field(..., title='User Login')
 
-
 class ChannelCreate(BaseModel):
     display_name: str = Field(..., max_length=200, min_length=1, title='Display Name')
     show_on_landing_page: bool | None = Field(True, title='Show On Landing Page')
 
-
 class ChannelExpandOption(Enum):
     channel_providers = 'channel_providers'
-
 
 class ChannelPointSettings(BaseModel):
     channel_id: UUID = Field(..., title='Channel Id')
@@ -839,7 +732,6 @@ class ChannelPointSettings(BaseModel):
     points_per_sub: int | None = Field(1000, title='Points Per Sub')
     points_per_cheer: int | None = Field(2, title='Points Per Cheer')
     ignore_users: list[str] | None = Field([], title='Ignore Users')
-
 
 class ChannelPointSettingsUpdate(BaseModel):
     enabled: bool | None = Field(True, title='Enabled')
@@ -854,7 +746,6 @@ class ChannelPointSettingsUpdate(BaseModel):
     points_per_cheer: int | None = Field(2, ge=0, le=65535, title='Points Per Cheer')
     ignore_users: list[str] | None = Field([], title='Ignore Users')
 
-
 class BotProvider1(BaseModel):
     id: UUID = Field(..., title='Id')
     provider: Provider = Field(..., title='Provider')
@@ -862,7 +753,6 @@ class BotProvider1(BaseModel):
     scope: str | None = Field(..., title='Scope')
     name: str | None = Field(..., title='Name')
     scope_needed: bool = Field(..., title='Scope Needed')
-
 
 class ChannelProviderPublic(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -889,7 +779,6 @@ class ChannelProviderPublic(BaseModel):
     bot_provider: BotProvider1 | None
     scope_needed: bool = Field(..., title='Scope Needed')
 
-
 class ChannelProviderStream(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
@@ -904,13 +793,11 @@ class ChannelProviderStream(BaseModel):
     viewer_watched_minutes: int | None = Field(..., title='Viewer Watched Minutes')
     chat_message_count: int | None = Field(..., title='Chat Message Count')
 
-
 class ChannelProviderStreamUpdate(BaseModel):
     stream_title: str | None = Field(None, title='Stream Title')
     stream_category: str | None = Field(None, title='Stream Category')
     stream_category_id: str | None = Field(None, title='Stream Category Id')
     stream_tags: list[str] | None = Field(None, title='Stream Tags')
-
 
 class ChannelQuote(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -925,7 +812,6 @@ class ChannelQuote(BaseModel):
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime | None = Field(None, title='Updated At')
 
-
 class ChannelQuoteCreate(BaseModel):
     message: str = Field(..., max_length=500, min_length=1, title='Message')
     provider: Provider = Field(..., title='Provider')
@@ -936,22 +822,18 @@ class ChannelQuoteCreate(BaseModel):
         ..., max_length=200, min_length=1, title='Created By Display Name'
     )
 
-
 class Message(RootModel[str]):
     root: str = Field(..., max_length=500, min_length=1, title='Message')
-
 
 class CreatedByProviderViewerId(RootModel[str]):
     root: str = Field(
         ..., max_length=255, min_length=1, title='Created By Provider Viewer Id'
     )
 
-
 class CreatedByDisplayName(RootModel[str]):
     root: str = Field(
         ..., max_length=200, min_length=1, title='Created By Display Name'
     )
-
 
 class ChannelQuoteUpdate(BaseModel):
     message: Message | None = Field(None, title='Message')
@@ -963,13 +845,12 @@ class ChannelQuoteUpdate(BaseModel):
         None, title='Created By Display Name'
     )
 
-
 class ChannelStream(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     started_at: AwareDatetime = Field(..., title='Started At')
     duration_seconds: int | None = Field(None, title='Duration Seconds')
-    providers: list[Provider] | None = Field([], title='Providers')
+    providers: list[Provider] | None = Field([], title='Provider')
     avg_viewer_count: int | None = Field(None, title='Avg Viewer Count')
     peak_viewer_count: int | None = Field(None, title='Peak Viewer Count')
     viewer_watched_minutes: int | None = Field(None, title='Viewer Watched Minutes')
@@ -977,29 +858,24 @@ class ChannelStream(BaseModel):
     unique_chatter_count: int | None = Field(None, title='Unique Chatter Count')
     chat_viewer_ratio: str | None = Field(..., title='Chat Viewer Ratio')
 
-
 class ChannelStreamStatsGroupBy(Enum):
     day = 'day'
     month = 'month'
     year = 'year'
     total = 'total'
 
-
 class DisplayName(RootModel[str]):
     root: str = Field(..., max_length=200, min_length=1, title='Display Name')
-
 
 class ChannelUpdate(BaseModel):
     display_name: DisplayName | None = Field(None, title='Display Name')
     show_on_landing_page: bool | None = Field(None, title='Show On Landing Page')
 
-
 class ChannelUserAccessLevel(BaseModel):
     id: UUID = Field(..., title='Id')
     user_id: UUID = Field(..., title='User Id')
     channel_id: UUID = Field(..., title='Channel Id')
-    access_level: AccessLevel = Field(..., title='TAccessLevel')
-
+    access_level: AccessLevel = Field(..., title='AccessLevel')
 
 class User(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -1011,38 +887,32 @@ class User(BaseModel):
     is_active: bool = Field(..., title='Is Active')
     default_channel_id: UUID | None = Field(None, title='Default Channel Id')
 
-
 class ChannelUserAccessLevelWithUser(BaseModel):
     id: UUID = Field(..., title='Id')
     user: User = Field(..., title='User')
     channel_id: UUID = Field(..., title='Channel Id')
-    access_level: AccessLevel = Field(..., title='TAccessLevel')
-
+    access_level: AccessLevel = Field(..., title='AccessLevel')
 
 class ChannelUserInvite(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
-    access_level: AccessLevel = Field(..., title='TAccessLevel')
+    access_level: AccessLevel = Field(..., title='AccessLevel')
     created_at: AwareDatetime = Field(..., title='Created At')
     expires_at: AwareDatetime = Field(..., title='Expires At')
     is_expired: bool = Field(..., title='Is Expired')
     invite_link: str = Field(..., title='Invite Link')
 
-
 class ChannelUserInviteCreate(BaseModel):
-    access_level: AccessLevel = Field(..., title='TAccessLevel')
-
+    access_level: AccessLevel = Field(..., title='AccessLevel')
 
 class ChannelUserInviteUpdate(BaseModel):
-    access_level: AccessLevel = Field(..., title='TAccessLevel')
-
+    access_level: AccessLevel = Field(..., title='AccessLevel')
 
 class Viewer(BaseModel):
     provider: Provider = Field(..., title='Provider')
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     name: str = Field(..., title='Name')
     display_name: str = Field(..., title='Display Name')
-
 
 class LastChannelProviderStream(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -1058,7 +928,6 @@ class LastChannelProviderStream(BaseModel):
     viewer_watched_minutes: int | None = Field(..., title='Viewer Watched Minutes')
     chat_message_count: int | None = Field(..., title='Chat Message Count')
 
-
 class Stats(BaseModel):
     channel_id: UUID = Field(..., title='Channel Id')
     provider: Provider = Field(..., title='Provider')
@@ -1072,11 +941,9 @@ class Stats(BaseModel):
     watchtime: int | None = Field(0, title='Watchtime')
     last_channel_provider_stream: LastChannelProviderStream | None = None
 
-
 class ChannelViewer(BaseModel):
     viewer: Viewer = Field(..., title='ProviderViewer')
     stats: Stats = Field(..., title='ChannelViewerStats')
-
 
 class LastChannelProviderStream1(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -1092,7 +959,6 @@ class LastChannelProviderStream1(BaseModel):
     viewer_watched_minutes: int | None = Field(..., title='Viewer Watched Minutes')
     chat_message_count: int | None = Field(..., title='Chat Message Count')
 
-
 class ChannelViewerStats(BaseModel):
     channel_id: UUID = Field(..., title='Channel Id')
     provider: Provider = Field(..., title='Provider')
@@ -1106,14 +972,6 @@ class ChannelViewerStats(BaseModel):
     watchtime: int | None = Field(0, title='Watchtime')
     last_channel_provider_stream: LastChannelProviderStream1 | None = None
 
-
-class Type11(Enum):
-    poll = 'poll'
-    progress = 'progress'
-    countdown = 'countdown'
-    notice = 'notice'
-
-
 class ChatEvent(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
@@ -1121,7 +979,7 @@ class ChatEvent(BaseModel):
     provider_channel_id: str = Field(..., title='Provider Channel Id')
     provider_event_id: str = Field(..., title='Provider Event Id')
     name: str = Field(..., title='Name')
-    type: Type11 = Field(..., title='Type')
+    type: ChatEventType = Field(..., title='Type')
     subtype: str | None = Field(None, title='Subtype')
     status: Status = Field(..., title='Status')
     poll_choices: list[PollChoice] | None = Field(None, title='Poll Choices')
@@ -1132,8 +990,7 @@ class ChatEvent(BaseModel):
     expired: bool | None = Field(False, title='Expired')
     locks_at: AwareDatetime | None = Field(None, title='Locks At')
 
-
-class Providers(Enum):
+class Provider(Enum):
     twitch = 'twitch'
     discord = 'discord'
     youtube = 'youtube'
@@ -1145,27 +1002,15 @@ class Providers(Enum):
     streamelements = 'streamelements'
     streamlabs = 'streamlabs'
 
-
-class ExcludeAccessLevel(IntEnum):
-    integer_0 = 0
-    integer_1 = 1
-    integer_2 = 2
-    integer_7 = 7
-    integer_100 = 100
-    integer_200 = 200
-    integer_500 = 500
-    integer_1000 = 1000
-
-
 class ChatFilterBannedTerms(BaseModel):
     id: UUID = Field(..., title='Id')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime = Field(..., title='Updated At')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
-    providers: list[Literal['all'] | Providers] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     enabled: bool = Field(..., title='Enabled')
-    exclude_access_level: ExcludeAccessLevel = Field(..., title='TAccessLevel')
+    exclude_access_level: AccessLevel = Field(..., title='AccessLevel')
     warning_enabled: bool = Field(..., title='Warning Enabled')
     warning_message: str = Field(..., title='Warning Message')
     warning_expire_duration: int = Field(..., title='Warning Expire Duration')
@@ -1173,16 +1018,15 @@ class ChatFilterBannedTerms(BaseModel):
     timeout_duration: int = Field(..., title='Timeout Duration')
     type: Literal['banned_terms'] = Field(..., title='Type')
 
-
 class ChatFilterBannedTermsCreate(BaseModel):
     name: str | None = Field(
         'Banned Terms Filter', max_length=255, min_length=1, title='Name'
     )
     enabled: bool | None = Field(True, title='Enabled')
-    providers: list[Literal['all'] | Providers] | None = Field(
-        ['all'], max_length=255, min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], max_length=255, min_length=1, title='Provider'
     )
-    exclude_access_level: ExcludeAccessLevel | None = Field(7, title='TAccessLevel')
+    exclude_access_level: AccessLevel | None = Field(7, title='AccessLevel')
     warning_enabled: bool | None = Field(False, title='Warning Enabled')
     warning_message: str | None = Field(
         'Banned word', max_length=500, min_length=0, title='Warning Message'
@@ -1194,43 +1038,20 @@ class ChatFilterBannedTermsCreate(BaseModel):
     timeout_duration: int | None = Field(60, title='Timeout Duration')
     type: Literal['banned_terms'] = Field(..., title='Type')
 
-
-class Name4(RootModel[str]):
+class FilterName(RootModel[str]):
     root: str = Field(..., max_length=255, min_length=1, title='Name')
-
-
-class Providers21(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers2(RootModel[list[Literal['all'] | Providers21]]):
-    root: list[Literal['all'] | Providers21] = Field(
-        ..., max_length=255, min_length=1, title='Providers'
-    )
-
 
 class WarningMessage(RootModel[str]):
     root: str = Field(..., max_length=500, min_length=0, title='Warning Message')
 
-
 class TimeoutMessage(RootModel[str]):
     root: str = Field(..., max_length=500, min_length=0, title='Timeout Message')
 
-
 class ChatFilterBannedTermsUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
+    name: FilterName | None = Field(None, title='Name')
     enabled: bool | None = Field(None, title='Enabled')
-    providers: Providers2 | None = Field(None, title='Providers')
-    exclude_access_level: ExcludeAccessLevel | None = None
+    providers: ProviderList | None = Field(None, title='Provider')
+    exclude_access_level: AccessLevel | None = None
     warning_enabled: bool | None = Field(None, title='Warning Enabled')
     warning_message: WarningMessage | None = Field(None, title='Warning Message')
     warning_expire_duration: int | None = Field(None, title='Warning Expire Duration')
@@ -1238,35 +1059,20 @@ class ChatFilterBannedTermsUpdate(BaseModel):
     timeout_duration: int | None = Field(None, title='Timeout Duration')
     type: Literal['banned_terms'] = Field(..., title='Type')
 
-
-class Providers3(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
 class ChatFilterBase(BaseModel):
     id: UUID = Field(..., title='Id')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime = Field(..., title='Updated At')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
-    providers: list[Literal['all'] | Providers3] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     enabled: bool = Field(..., title='Enabled')
-    exclude_access_level: ExcludeAccessLevel = Field(..., title='TAccessLevel')
+    exclude_access_level: AccessLevel = Field(..., title='AccessLevel')
     warning_enabled: bool = Field(..., title='Warning Enabled')
     warning_message: str = Field(..., title='Warning Message')
     warning_expire_duration: int = Field(..., title='Warning Expire Duration')
     timeout_message: str = Field(..., title='Timeout Message')
     timeout_duration: int = Field(..., title='Timeout Duration')
-
 
 class Settings(BaseModel):
     model_config = ConfigDict(
@@ -1275,16 +1081,15 @@ class Settings(BaseModel):
     min_length: int | None = Field(20, ge=0, title='Min Length')
     max_percent: int | None = Field(60, ge=0, le=100, title='Max Percent')
 
-
 class ChatFilterCaps(BaseModel):
     id: UUID = Field(..., title='Id')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime = Field(..., title='Updated At')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
-    providers: list[Literal['all'] | Providers3] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     enabled: bool = Field(..., title='Enabled')
-    exclude_access_level: ExcludeAccessLevel = Field(..., title='TAccessLevel')
+    exclude_access_level: AccessLevel = Field(..., title='AccessLevel')
     warning_enabled: bool = Field(..., title='Warning Enabled')
     warning_message: str = Field(..., title='Warning Message')
     warning_expire_duration: int = Field(..., title='Warning Expire Duration')
@@ -1293,14 +1098,13 @@ class ChatFilterCaps(BaseModel):
     type: Literal['caps'] = Field(..., title='Type')
     settings: Settings = Field(..., title='ChatFilterCapsSettings')
 
-
 class ChatFilterCapsCreate(BaseModel):
     name: str | None = Field('Caps Filter', max_length=255, min_length=1, title='Name')
     enabled: bool | None = Field(True, title='Enabled')
-    providers: list[Literal['all'] | Providers3] | None = Field(
-        ['all'], max_length=255, min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], max_length=255, min_length=1, title='Provider'
     )
-    exclude_access_level: ExcludeAccessLevel | None = Field(7, title='TAccessLevel')
+    exclude_access_level: AccessLevel | None = Field(7, title='AccessLevel')
     warning_enabled: bool | None = Field(False, title='Warning Enabled')
     warning_message: str | None = Field(
         'Please stop using all caps',
@@ -1324,7 +1128,6 @@ class ChatFilterCapsCreate(BaseModel):
         title='ChatFilterCapsSettings',
     )
 
-
 class ChatFilterCapsSettings(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1332,31 +1135,11 @@ class ChatFilterCapsSettings(BaseModel):
     min_length: int | None = Field(20, ge=0, title='Min Length')
     max_percent: int | None = Field(60, ge=0, le=100, title='Max Percent')
 
-
-class Providers61(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers6(RootModel[list[Literal['all'] | Providers61]]):
-    root: list[Literal['all'] | Providers61] = Field(
-        ..., max_length=255, min_length=1, title='Providers'
-    )
-
-
 class ChatFilterCapsUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
+    name: FilterName | None = Field(None, title='Name')
     enabled: bool | None = Field(None, title='Enabled')
-    providers: Providers6 | None = Field(None, title='Providers')
-    exclude_access_level: ExcludeAccessLevel | None = None
+    providers: ProviderList | None = Field(None, title='Provider')
+    exclude_access_level: AccessLevel | None = None
     warning_enabled: bool | None = Field(None, title='Warning Enabled')
     warning_message: WarningMessage | None = Field(None, title='Warning Message')
     warning_expire_duration: int | None = Field(None, title='Warning Expire Duration')
@@ -1365,26 +1148,11 @@ class ChatFilterCapsUpdate(BaseModel):
     type: Literal['caps'] = Field(..., title='Type')
     settings: Settings | None = None
 
-
-class Providers7(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
 class Settings3(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     max_emotes: int | None = Field(20, ge=0, title='Max Emotes')
-
 
 class ChatFilterEmote(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -1392,9 +1160,9 @@ class ChatFilterEmote(BaseModel):
     updated_at: AwareDatetime = Field(..., title='Updated At')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
-    providers: list[Literal['all'] | Providers7] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     enabled: bool = Field(..., title='Enabled')
-    exclude_access_level: ExcludeAccessLevel = Field(..., title='TAccessLevel')
+    exclude_access_level: AccessLevel = Field(..., title='AccessLevel')
     warning_enabled: bool = Field(..., title='Warning Enabled')
     warning_message: str = Field(..., title='Warning Message')
     warning_expire_duration: int = Field(..., title='Warning Expire Duration')
@@ -1403,14 +1171,13 @@ class ChatFilterEmote(BaseModel):
     type: Literal['emote'] = Field(..., title='Type')
     settings: Settings3 = Field(..., title='ChatFilterEmoteSettings')
 
-
 class ChatFilterEmoteCreate(BaseModel):
     name: str | None = Field('Emote Filter', max_length=255, min_length=1, title='Name')
     enabled: bool | None = Field(True, title='Enabled')
-    providers: list[Literal['all'] | Providers7] | None = Field(
-        ['all'], max_length=255, min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], max_length=255, min_length=1, title='Provider'
     )
-    exclude_access_level: ExcludeAccessLevel | None = Field(7, title='TAccessLevel')
+    exclude_access_level: AccessLevel | None = Field(7, title='AccessLevel')
     warning_enabled: bool | None = Field(False, title='Warning Enabled')
     warning_message: str | None = Field(
         'Chill with the emotes', max_length=500, min_length=0, title='Warning Message'
@@ -1426,38 +1193,17 @@ class ChatFilterEmoteCreate(BaseModel):
         title='ChatFilterEmoteSettings',
     )
 
-
 class ChatFilterEmoteSettings(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     max_emotes: int | None = Field(20, ge=0, title='Max Emotes')
 
-
-class Providers91(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers9(RootModel[list[Literal['all'] | Providers91]]):
-    root: list[Literal['all'] | Providers91] = Field(
-        ..., max_length=255, min_length=1, title='Providers'
-    )
-
-
 class ChatFilterEmoteUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
+    name: FilterName | None = Field(None, title='Name')
     enabled: bool | None = Field(None, title='Enabled')
-    providers: Providers9 | None = Field(None, title='Providers')
-    exclude_access_level: ExcludeAccessLevel | None = None
+    providers: ProviderList | None = Field(None, title='Provider')
+    exclude_access_level: AccessLevel | None = None
     warning_enabled: bool | None = Field(None, title='Warning Enabled')
     warning_message: WarningMessage | None = Field(None, title='Warning Message')
     warning_expire_duration: int | None = Field(None, title='Warning Expire Duration')
@@ -1466,29 +1212,15 @@ class ChatFilterEmoteUpdate(BaseModel):
     type: Literal['emote'] = Field(..., title='Type')
     settings: Settings3 | None = None
 
-
-class Providers10(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
 class ChatFilterLink(BaseModel):
     id: UUID = Field(..., title='Id')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime = Field(..., title='Updated At')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
-    providers: list[Literal['all'] | Providers10] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     enabled: bool = Field(..., title='Enabled')
-    exclude_access_level: ExcludeAccessLevel = Field(..., title='TAccessLevel')
+    exclude_access_level: AccessLevel = Field(..., title='AccessLevel')
     warning_enabled: bool = Field(..., title='Warning Enabled')
     warning_message: str = Field(..., title='Warning Message')
     warning_expire_duration: int = Field(..., title='Warning Expire Duration')
@@ -1496,14 +1228,13 @@ class ChatFilterLink(BaseModel):
     timeout_duration: int = Field(..., title='Timeout Duration')
     type: Literal['link'] = Field(..., title='Type')
 
-
 class ChatFilterLinkCreate(BaseModel):
     name: str | None = Field('Link Filter', max_length=255, min_length=1, title='Name')
     enabled: bool | None = Field(True, title='Enabled')
-    providers: list[Literal['all'] | Providers10] | None = Field(
-        ['all'], max_length=255, min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], max_length=255, min_length=1, title='Provider'
     )
-    exclude_access_level: ExcludeAccessLevel | None = Field(7, title='TAccessLevel')
+    exclude_access_level: AccessLevel | None = Field(7, title='AccessLevel')
     warning_enabled: bool | None = Field(False, title='Warning Enabled')
     warning_message: str | None = Field(
         'You are not permitted to post links',
@@ -1521,51 +1252,17 @@ class ChatFilterLinkCreate(BaseModel):
     timeout_duration: int | None = Field(60, title='Timeout Duration')
     type: Literal['link'] = Field(..., title='Type')
 
-
-class Providers121(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers12(RootModel[list[Literal['all'] | Providers121]]):
-    root: list[Literal['all'] | Providers121] = Field(
-        ..., max_length=255, min_length=1, title='Providers'
-    )
-
-
 class ChatFilterLinkUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
+    name: FilterName | None = Field(None, title='Name')
     enabled: bool | None = Field(None, title='Enabled')
-    providers: Providers12 | None = Field(None, title='Providers')
-    exclude_access_level: ExcludeAccessLevel | None = None
+    providers: ProviderList | None = Field(None, title='Provider')
+    exclude_access_level: AccessLevel | None = None
     warning_enabled: bool | None = Field(None, title='Warning Enabled')
     warning_message: WarningMessage | None = Field(None, title='Warning Message')
     warning_expire_duration: int | None = Field(None, title='Warning Expire Duration')
     timeout_message: TimeoutMessage | None = Field(None, title='Timeout Message')
     timeout_duration: int | None = Field(None, title='Timeout Duration')
     type: Literal['link'] = Field(..., title='Type')
-
-
-class Providers13(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
 
 class Settings6(BaseModel):
     model_config = ConfigDict(
@@ -1574,16 +1271,15 @@ class Settings6(BaseModel):
     min_length: int | None = Field(5, ge=0, title='Min Length')
     max_percent: int | None = Field(80, ge=0, le=100, title='Max Percent')
 
-
 class ChatFilterNonLatin(BaseModel):
     id: UUID = Field(..., title='Id')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime = Field(..., title='Updated At')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
-    providers: list[Literal['all'] | Providers13] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     enabled: bool = Field(..., title='Enabled')
-    exclude_access_level: ExcludeAccessLevel = Field(..., title='TAccessLevel')
+    exclude_access_level: AccessLevel = Field(..., title='AccessLevel')
     warning_enabled: bool = Field(..., title='Warning Enabled')
     warning_message: str = Field(..., title='Warning Message')
     warning_expire_duration: int = Field(..., title='Warning Expire Duration')
@@ -1592,16 +1288,15 @@ class ChatFilterNonLatin(BaseModel):
     type: Literal['non_latin'] = Field(..., title='Type')
     settings: Settings6 = Field(..., title='ChatFilterNonLatinSettings')
 
-
 class ChatFilterNonLatinCreate(BaseModel):
     name: str | None = Field(
         'Non-latin Filter', max_length=255, min_length=1, title='Name'
     )
     enabled: bool | None = Field(True, title='Enabled')
-    providers: list[Literal['all'] | Providers13] | None = Field(
-        ['all'], max_length=255, min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], max_length=255, min_length=1, title='Provider'
     )
-    exclude_access_level: ExcludeAccessLevel | None = Field(7, title='TAccessLevel')
+    exclude_access_level: AccessLevel | None = Field(7, title='AccessLevel')
     warning_enabled: bool | None = Field(False, title='Warning Enabled')
     warning_message: str | None = Field(
         'Please use latin letters',
@@ -1625,7 +1320,6 @@ class ChatFilterNonLatinCreate(BaseModel):
         title='ChatFilterNonLatinSettings',
     )
 
-
 class ChatFilterNonLatinSettings(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1633,31 +1327,11 @@ class ChatFilterNonLatinSettings(BaseModel):
     min_length: int | None = Field(5, ge=0, title='Min Length')
     max_percent: int | None = Field(80, ge=0, le=100, title='Max Percent')
 
-
-class Providers151(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers15(RootModel[list[Literal['all'] | Providers151]]):
-    root: list[Literal['all'] | Providers151] = Field(
-        ..., max_length=255, min_length=1, title='Providers'
-    )
-
-
 class ChatFilterNonLatinUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
+    name: FilterName | None = Field(None, title='Name')
     enabled: bool | None = Field(None, title='Enabled')
-    providers: Providers15 | None = Field(None, title='Providers')
-    exclude_access_level: ExcludeAccessLevel | None = None
+    providers: ProviderList | None = Field(None, title='Provider')
+    exclude_access_level: AccessLevel | None = None
     warning_enabled: bool | None = Field(None, title='Warning Enabled')
     warning_message: WarningMessage | None = Field(None, title='Warning Message')
     warning_expire_duration: int | None = Field(None, title='Warning Expire Duration')
@@ -1666,26 +1340,11 @@ class ChatFilterNonLatinUpdate(BaseModel):
     type: Literal['non_latin'] = Field(..., title='Type')
     settings: Settings6 | None = None
 
-
-class Providers16(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
 class Settings9(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     max_length: int | None = Field(350, ge=0, title='Max Length')
-
 
 class ChatFilterParagraph(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -1693,9 +1352,9 @@ class ChatFilterParagraph(BaseModel):
     updated_at: AwareDatetime = Field(..., title='Updated At')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
-    providers: list[Literal['all'] | Providers16] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     enabled: bool = Field(..., title='Enabled')
-    exclude_access_level: ExcludeAccessLevel = Field(..., title='TAccessLevel')
+    exclude_access_level: AccessLevel = Field(..., title='AccessLevel')
     warning_enabled: bool = Field(..., title='Warning Enabled')
     warning_message: str = Field(..., title='Warning Message')
     warning_expire_duration: int = Field(..., title='Warning Expire Duration')
@@ -1704,16 +1363,15 @@ class ChatFilterParagraph(BaseModel):
     type: Literal['paragraph'] = Field(..., title='Type')
     settings: Settings9 = Field(..., title='ChatFilterParagraphSettings')
 
-
 class ChatFilterParagraphCreate(BaseModel):
     name: str | None = Field(
         'Paragraph Filter', max_length=255, min_length=1, title='Name'
     )
     enabled: bool | None = Field(True, title='Enabled')
-    providers: list[Literal['all'] | Providers16] | None = Field(
-        ['all'], max_length=255, min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], max_length=255, min_length=1, title='Provider'
     )
-    exclude_access_level: ExcludeAccessLevel | None = Field(7, title='TAccessLevel')
+    exclude_access_level: AccessLevel | None = Field(7, title='AccessLevel')
     warning_enabled: bool | None = Field(False, title='Warning Enabled')
     warning_message: str | None = Field(
         'Your message was too long',
@@ -1735,38 +1393,17 @@ class ChatFilterParagraphCreate(BaseModel):
         title='ChatFilterParagraphSettings',
     )
 
-
 class ChatFilterParagraphSettings(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     max_length: int | None = Field(350, ge=0, title='Max Length')
 
-
-class Providers181(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers18(RootModel[list[Literal['all'] | Providers181]]):
-    root: list[Literal['all'] | Providers181] = Field(
-        ..., max_length=255, min_length=1, title='Providers'
-    )
-
-
 class ChatFilterParagraphUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
+    name: FilterName | None = Field(None, title='Name')
     enabled: bool | None = Field(None, title='Enabled')
-    providers: Providers18 | None = Field(None, title='Providers')
-    exclude_access_level: ExcludeAccessLevel | None = None
+    providers: ProviderList | None = Field(None, title='Provider')
+    exclude_access_level: AccessLevel | None = None
     warning_enabled: bool | None = Field(None, title='Warning Enabled')
     warning_message: WarningMessage | None = Field(None, title='Warning Message')
     warning_expire_duration: int | None = Field(None, title='Warning Expire Duration')
@@ -1775,26 +1412,11 @@ class ChatFilterParagraphUpdate(BaseModel):
     type: Literal['paragraph'] = Field(..., title='Type')
     settings: Settings9 | None = None
 
-
-class Providers19(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
 class Settings12(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     max_symbols: int | None = Field(20, ge=0, title='Max Symbols')
-
 
 class ChatFilterSymbol(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -1802,9 +1424,9 @@ class ChatFilterSymbol(BaseModel):
     updated_at: AwareDatetime = Field(..., title='Updated At')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
-    providers: list[Literal['all'] | Providers19] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     enabled: bool = Field(..., title='Enabled')
-    exclude_access_level: ExcludeAccessLevel = Field(..., title='TAccessLevel')
+    exclude_access_level: AccessLevel = Field(..., title='AccessLevel')
     warning_enabled: bool = Field(..., title='Warning Enabled')
     warning_message: str = Field(..., title='Warning Message')
     warning_expire_duration: int = Field(..., title='Warning Expire Duration')
@@ -1813,16 +1435,15 @@ class ChatFilterSymbol(BaseModel):
     type: Literal['symbol'] = Field(..., title='Type')
     settings: Settings12 = Field(..., title='ChatFilterSymbolSettings')
 
-
 class ChatFilterSymbolCreate(BaseModel):
     name: str | None = Field(
         'Symbol Filter', max_length=255, min_length=1, title='Name'
     )
     enabled: bool | None = Field(True, title='Enabled')
-    providers: list[Literal['all'] | Providers19] | None = Field(
-        ['all'], max_length=255, min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], max_length=255, min_length=1, title='Provider'
     )
-    exclude_access_level: ExcludeAccessLevel | None = Field(7, title='TAccessLevel')
+    exclude_access_level: AccessLevel | None = Field(7, title='AccessLevel')
     warning_enabled: bool | None = Field(False, title='Warning Enabled')
     warning_message: str | None = Field(
         'Your message contained too many symbols',
@@ -1844,38 +1465,17 @@ class ChatFilterSymbolCreate(BaseModel):
         title='ChatFilterSymbolSettings',
     )
 
-
 class ChatFilterSymbolSettings(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     max_symbols: int | None = Field(20, ge=0, title='Max Symbols')
 
-
-class Providers221(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers22(RootModel[list[Literal['all'] | Providers221]]):
-    root: list[Literal['all'] | Providers221] = Field(
-        ..., max_length=255, min_length=1, title='Providers'
-    )
-
-
 class ChatFilterSymbolUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
+    name: FilterName | None = Field(None, title='Name')
     enabled: bool | None = Field(None, title='Enabled')
-    providers: Providers22 | None = Field(None, title='Providers')
-    exclude_access_level: ExcludeAccessLevel | None = None
+    providers: ProviderList | None = Field(None, title='Provider')
+    exclude_access_level: AccessLevel | None = None
     warning_enabled: bool | None = Field(None, title='Warning Enabled')
     warning_message: WarningMessage | None = Field(None, title='Warning Message')
     warning_expire_duration: int | None = Field(None, title='Warning Expire Duration')
@@ -1884,96 +1484,37 @@ class ChatFilterSymbolUpdate(BaseModel):
     type: Literal['symbol'] = Field(..., title='Type')
     settings: Settings12 | None = None
 
-
-class Type12(Enum):
+class ChatMessageRecordType(Enum):
     message = 'message'
     notice = 'notice'
     status = 'status'
     automod = 'automod'
 
-
 class SubType1(RootModel[str]):
     root: str = Field(..., max_length=100, min_length=1, title='Sub Type')
 
-
-class Type13(Enum):
-    text = 'text'
-    emote = 'emote'
-    mention = 'mention'
-    gift = 'gift'
-    date = 'date'
-    link = 'link'
-
-
-class Gift1(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    type: str = Field(..., title='Type')
-    count: int = Field(..., title='Count')
-    count_decimal_place: int | None = Field(0, title='Count Decimal Place')
-    count_currency: CountCurrency | None = Field(None, title='Count Currency')
-    animated: bool | None = Field(False, title='Animated')
-    image_url: str | None = Field(None, title='Image Url')
-
-
-class Emote3(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    animated: bool = Field(..., title='Animated')
-    emote_provider: str = Field(..., title='Emote Provider')
-    urls: Urls | None
-
-
-class Mention3(BaseModel):
-    user_id: str = Field(..., title='User Id')
-    username: str = Field(..., title='Username')
-    display_name: str = Field(..., title='Display Name')
-
-
 class MessagePart1(BaseModel):
-    type: Type13 = Field(..., title='Type')
+    type: MessagePartType = Field(..., title='Type')
     text: str = Field(..., title='Text')
-    gift: Gift1 | None = None
-    emote: Emote3 | None = None
-    mention: Mention3 | None = None
+    gift: Gift | None = None
+    emote: Emote | None = None
+    mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
-
 
 class Badge(BaseModel):
     id: str = Field(..., title='Id')
     type: str = Field(..., title='Type')
     name: str = Field(..., title='Name')
 
-
-class Gift2(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    type: str = Field(..., title='Type')
-    count: int = Field(..., title='Count')
-    count_decimal_place: int | None = Field(0, title='Count Decimal Place')
-    count_currency: CountCurrency | None = Field(None, title='Count Currency')
-    animated: bool | None = Field(False, title='Animated')
-    image_url: str | None = Field(None, title='Image Url')
-
-
-class Emote4(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    animated: bool = Field(..., title='Animated')
-    emote_provider: str = Field(..., title='Emote Provider')
-    urls: Urls | None
-
-
 class NoticeMessagePart(BaseModel):
-    type: Type13 = Field(..., title='Type')
+    type: MessagePartType = Field(..., title='Type')
     text: str = Field(..., title='Text')
-    gift: Gift2 | None = None
-    emote: Emote4 | None = None
-    mention: Mention3 | None = None
+    gift: Gift | None = None
+    emote: Emote | None = None
+    mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
-
 
 class Parent(BaseModel):
     provider_message_id: str = Field(..., title='Provider Message Id')
@@ -1982,10 +1523,9 @@ class Parent(BaseModel):
     viewer_name: str = Field(..., title='Viewer Name')
     viewer_display_name: str = Field(..., title='Viewer Display Name')
 
-
 class ChatMessage(BaseModel):
     id: UUID = Field(..., title='Id')
-    type: Type12 = Field(..., title='Type')
+    type: ChatMessageRecordType = Field(..., title='Type')
     sub_type: SubType1 | None = Field(None, title='Sub Type')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime | None = Field(None, title='Updated At')
@@ -2024,25 +1564,15 @@ class ChatMessage(BaseModel):
     )
     parent: Parent | None = None
 
-
 class ChatMessageBadge(BaseModel):
     id: str = Field(..., title='Id')
     type: str = Field(..., title='Type')
     name: str = Field(..., title='Name')
 
-
 class ChatMessageBadgeRequest(BaseModel):
     id: str = Field(..., title='Id')
     type: str = Field(..., title='Type')
     name: str = Field(..., title='Name')
-
-
-class Type15(Enum):
-    message = 'message'
-    notice = 'notice'
-    status = 'status'
-    automod = 'automod'
-
 
 class SubType21(Enum):
     sub = 'sub'
@@ -2068,7 +1598,6 @@ class SubType21(Enum):
     shared_chat_announcement = 'shared_chat_announcement'
     cheer = 'cheer'
     twitch_shoutout = 'twitch_shoutout'
-
 
 class SubType22(Enum):
     ban = 'ban'
@@ -2103,7 +1632,6 @@ class SubType22(Enum):
     shield_mode_activated = 'shield_mode_activated'
     shield_mode_deactivated = 'shield_mode_deactivated'
 
-
 class SubType23(Enum):
     text = 'text'
     custom_reward_redemption = 'custom_reward_redemption'
@@ -2114,7 +1642,6 @@ class SubType23(Enum):
     power_ups_gigantified_emote = 'power_ups_gigantified_emote'
     first_message = 'first_message'
     returning_chatter = 'returning_chatter'
-
 
 class SubType24(Enum):
     chat_ended_event = 'chatEndedEvent'
@@ -2127,7 +1654,6 @@ class SubType24(Enum):
     user_banned_event = 'userBannedEvent'
     poll_details = 'pollDetails'
 
-
 class SubType25(Enum):
     new_sponsor_event = 'newSponsorEvent'
     super_chat_event = 'superChatEvent'
@@ -2135,12 +1661,10 @@ class SubType25(Enum):
     membership_gifting_event = 'membershipGiftingEvent'
     gift_membership_received_event = 'giftMembershipReceivedEvent'
 
-
 class SubType26(RootModel[Literal['tiktok_gift']]):
     root: Literal['tiktok_gift'] = Field(
         ..., max_length=100, min_length=1, title='Sub Type'
     )
-
 
 class SubType27(Enum):
     kick_sub = 'kick_sub'
@@ -2149,20 +1673,16 @@ class SubType27(Enum):
     kick_gift_sub = 'kick_gift_sub'
     kick_kicks_gift = 'kick_kicks_gift'
 
-
 class SubType28(Enum):
     kick_ban = 'kick_ban'
     kick_timeout = 'kick_timeout'
-
 
 class SubType29(Enum):
     first_message = 'first_message'
     returning_chatter = 'returning_chatter'
 
-
 class SubType210(RootModel[str]):
     root: str = Field(..., max_length=100, min_length=1, title='Sub Type')
-
 
 class SubType2(
     RootModel[
@@ -2173,8 +1693,8 @@ class SubType2(
         | SubType25
         | SubType26
         | SubType27
-        | SubType28
-        | SubType29
+        | SubMessagePartType
+        | SubBannedTermType
         | SubType210
     ]
 ):
@@ -2186,11 +1706,10 @@ class SubType2(
         | SubType25
         | SubType26
         | SubType27
-        | SubType28
-        | SubType29
+        | SubMessagePartType
+        | SubBannedTermType
         | SubType210
     ) = Field(..., max_length=100, min_length=1, title='Sub Type')
-
 
 class ViewerColor(RootModel[str]):
     root: str = Field(
@@ -2201,8 +1720,7 @@ class ViewerColor(RootModel[str]):
         title='Viewer Color',
     )
 
-
-class Type16(Enum):
+class ActivityType(Enum):
     text = 'text'
     emote = 'emote'
     mention = 'mention'
@@ -2210,102 +1728,49 @@ class Type16(Enum):
     date = 'date'
     link = 'link'
 
-
-class Type17(Enum):
+class ActivitySubType(Enum):
     bits = 'bits'
     kicks = 'kicks'
     diamond = 'diamond'
     currency = 'currency'
-
-
-class Gift3(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    type: str | Type17 = Field(..., title='Type')
-    count: int = Field(..., title='Count')
-    count_decimal_place: int | None = Field(0, title='Count Decimal Place')
-    count_currency: CountCurrency | None = Field(None, title='Count Currency')
-    animated: bool | None = Field(False, title='Animated')
-    image_url: str | None = Field(None, title='Image Url')
-
-
-class Emote5(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    animated: bool = Field(..., title='Animated')
-    emote_provider: str = Field(..., title='Emote Provider')
-
 
 class MessagePart2(BaseModel):
-    type: Type16 = Field(..., title='Type')
+    type: ActivityType = Field(..., title='Type')
     text: str = Field(..., title='Text')
-    gift: Gift3 | None = None
-    emote: Emote5 | None = None
-    mention: Mention3 | None = None
+    gift: Gift | None = None
+    emote: Emote | None = None
+    mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
-
-
-class Type18(Enum):
-    text = 'text'
-    emote = 'emote'
-    mention = 'mention'
-    gift = 'gift'
-    date = 'date'
-    link = 'link'
-
-
-class Type19(Enum):
-    bits = 'bits'
-    kicks = 'kicks'
-    diamond = 'diamond'
-    currency = 'currency'
-
-
-class Gift4(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    type: str | Type19 = Field(..., title='Type')
-    count: int = Field(..., title='Count')
-    count_decimal_place: int | None = Field(0, title='Count Decimal Place')
-    count_currency: CountCurrency | None = Field(None, title='Count Currency')
-    animated: bool | None = Field(False, title='Animated')
-    image_url: str | None = Field(None, title='Image Url')
-
 
 class NoticeMessagePart1(BaseModel):
-    type: Type18 = Field(..., title='Type')
+    type: MessagePartType = Field(..., title='Type')
     text: str = Field(..., title='Text')
-    gift: Gift4 | None = None
-    emote: Emote5 | None = None
-    mention: Mention3 | None = None
+    gift: Gift | None = None
+    emote: Emote | None = None
+    mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
-
 
 class SourceProviderChannelId(RootModel[str]):
     root: str = Field(
         ..., max_length=255, min_length=1, title='Source Provider Channel Id'
     )
 
-
 class SourceProviderChannelName(RootModel[str]):
     root: str = Field(
         ..., max_length=255, min_length=1, title='Source Provider Channel Name'
     )
-
 
 class SourceProviderChannelDisplayName(RootModel[str]):
     root: str = Field(
         ..., max_length=255, min_length=1, title='Source Provider Channel Display Name'
     )
 
-
 class ParentProviderThreadId(RootModel[str]):
     root: str = Field(
         ..., max_length=255, min_length=1, title='Parent Provider Thread Id'
     )
-
 
 class Parent1(BaseModel):
     provider_message_id: str = Field(
@@ -2320,10 +1785,9 @@ class Parent1(BaseModel):
         ..., max_length=200, min_length=1, title='Viewer Display Name'
     )
 
-
 class ChatMessageCreate(BaseModel):
     id: UUID | None = Field(None, title='Id')
-    type: Type15 = Field(..., title='Type')
+    type: ChatEventType = Field(..., title='Type')
     sub_type: SubType2 | None = Field(None, title='Sub Type')
     created_at: AwareDatetime | None = Field(None, title='Created At')
     channel_id: UUID = Field(..., title='Channel Id')
@@ -2344,7 +1808,7 @@ class ChatMessageCreate(BaseModel):
     viewer_color: ViewerColor | None = Field(None, title='Viewer Color')
     message_parts: list[MessagePart2] | None = Field(None, title='Message Parts')
     badges: list[Badge] | None = Field(default_factory=list, title='Badges')
-    access_level: AccessLevel | None = Field(0, title='TAccessLevel')
+    access_level: AccessLevel | None = Field(0, title='AccessLevel')
     notice_message_parts: list[NoticeMessagePart1] | None = Field(
         None, title='Notice Message Parts'
     )
@@ -2362,14 +1826,12 @@ class ChatMessageCreate(BaseModel):
     )
     parent: Parent1 | None = None
 
-
 class ChatMessageParent(BaseModel):
     provider_message_id: str = Field(..., title='Provider Message Id')
     message: str = Field(..., title='Message')
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     viewer_name: str = Field(..., title='Viewer Name')
     viewer_display_name: str = Field(..., title='Viewer Display Name')
-
 
 class ChatMessageParentRequest(BaseModel):
     provider_message_id: str = Field(
@@ -2384,79 +1846,29 @@ class ChatMessageParentRequest(BaseModel):
         ..., max_length=200, min_length=1, title='Viewer Display Name'
     )
 
-
-class Type20(Enum):
-    text = 'text'
-    emote = 'emote'
-    mention = 'mention'
-    gift = 'gift'
-    date = 'date'
-    link = 'link'
-
-
-class Gift5(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    type: str = Field(..., title='Type')
-    count: int = Field(..., title='Count')
-    count_decimal_place: int | None = Field(0, title='Count Decimal Place')
-    count_currency: CountCurrency | None = Field(None, title='Count Currency')
-    animated: bool | None = Field(False, title='Animated')
-    image_url: str | None = Field(None, title='Image Url')
-
-
-class Emote7(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    animated: bool = Field(..., title='Animated')
-    emote_provider: str = Field(..., title='Emote Provider')
-    urls: Urls | None
-
-
 class ChatMessagePart(BaseModel):
-    type: Type20 = Field(..., title='Type')
+    type: ActivityType = Field(..., title='Type')
     text: str = Field(..., title='Text')
-    gift: Gift5 | None = None
-    emote: Emote7 | None = None
-    mention: Mention3 | None = None
+    gift: Gift | None = None
+    emote: Emote | None = None
+    mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
 
-
-class Type22(Enum):
+class RateLimitType(Enum):
     bits = 'bits'
     kicks = 'kicks'
     diamond = 'diamond'
     currency = 'currency'
 
-
-class Gift6(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    type: str | Type22 = Field(..., title='Type')
-    count: int = Field(..., title='Count')
-    count_decimal_place: int | None = Field(0, title='Count Decimal Place')
-    count_currency: CountCurrency | None = Field(None, title='Count Currency')
-    animated: bool | None = Field(False, title='Animated')
-    image_url: str | None = Field(None, title='Image Url')
-
-
-class Emote8(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    animated: bool = Field(..., title='Animated')
-    emote_provider: str = Field(..., title='Emote Provider')
-
-
 class ChatMessagePartRequest(BaseModel):
-    type: Type20 = Field(..., title='Type')
+    type: ActivityType = Field(..., title='Type')
     text: str = Field(..., title='Text')
-    gift: Gift6 | None = None
-    emote: Emote8 | None = None
-    mention: Mention3 | None = None
+    gift: Gift | None = None
+    emote: Emote | None = None
+    mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
-
 
 class Size(Enum):
     xxs = 'xxs'
@@ -2468,24 +1880,9 @@ class Size(Enum):
     xxl = 'xxl'
     xxxl = 'xxxl'
 
-
 class MessageOrder(Enum):
     top = 'top'
     bottom = 'bottom'
-
-
-class Providers23(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
 
 class Settings15(BaseModel):
     size: Size | None = Field('lg', title='ChatWidgetSize')
@@ -2504,13 +1901,12 @@ class Settings15(BaseModel):
     provider_logo: bool | None = Field(False, title='Provider Logo')
     badges: bool | None = Field(True, title='Badges')
     message_order: MessageOrder | None = Field('bottom', title='Message Order')
-    providers: list[Literal['all'] | Providers23] | None = Field(
-        ['all'], title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], title='Provider'
     )
     style_type: str | None = Field('simple', title='Style Type')
     entrance_animation_type: str | None = Field('', title='Entrance Animation Type')
     custom_css: str | None = Field('', title='Custom Css')
-
 
 class ChatWidget(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -2520,7 +1916,6 @@ class ChatWidget(BaseModel):
     updated_at: AwareDatetime = Field(..., title='Updated At')
     type: Literal['chat_widget'] = Field('chat_widget', title='Type')
     settings: Settings15 = Field(..., title='ChatWidgetSettings')
-
 
 class Settings16(BaseModel):
     size: Size | None = Field('lg', title='ChatWidgetSize')
@@ -2551,13 +1946,12 @@ class Settings16(BaseModel):
     provider_logo: bool | None = Field(False, title='Provider Logo')
     badges: bool | None = Field(True, title='Badges')
     message_order: MessageOrder | None = Field('bottom', title='Message Order')
-    providers: list[Literal['all'] | Providers23] | None = Field(
-        ['all'], title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], title='Provider'
     )
     style_type: str | None = Field('simple', title='Style Type')
     entrance_animation_type: str | None = Field('', title='Entrance Animation Type')
     custom_css: str | None = Field('', title='Custom Css')
-
 
 class ChatWidgetCreate(BaseModel):
     name: str = Field(..., max_length=255, min_length=1, title='Name')
@@ -2588,7 +1982,6 @@ class ChatWidgetCreate(BaseModel):
         title='ChatWidgetSettingsCreate',
     )
 
-
 class ChatWidgetSettings(BaseModel):
     size: Size | None = Field('lg', title='ChatWidgetSize')
     text_color: str | None = Field('#ffffff', title='Text Color')
@@ -2606,13 +1999,12 @@ class ChatWidgetSettings(BaseModel):
     provider_logo: bool | None = Field(False, title='Provider Logo')
     badges: bool | None = Field(True, title='Badges')
     message_order: MessageOrder | None = Field('bottom', title='Message Order')
-    providers: list[Literal['all'] | Providers23] | None = Field(
-        ['all'], title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], title='Provider'
     )
     style_type: str | None = Field('simple', title='Style Type')
     entrance_animation_type: str | None = Field('', title='Entrance Animation Type')
     custom_css: str | None = Field('', title='Custom Css')
-
 
 class ChatWidgetSettingsCreate(BaseModel):
     size: Size | None = Field('lg', title='ChatWidgetSize')
@@ -2643,66 +2035,39 @@ class ChatWidgetSettingsCreate(BaseModel):
     provider_logo: bool | None = Field(False, title='Provider Logo')
     badges: bool | None = Field(True, title='Badges')
     message_order: MessageOrder | None = Field('bottom', title='Message Order')
-    providers: list[Literal['all'] | Providers23] | None = Field(
-        ['all'], title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], title='Provider'
     )
     style_type: str | None = Field('simple', title='Style Type')
     entrance_animation_type: str | None = Field('', title='Entrance Animation Type')
     custom_css: str | None = Field('', title='Custom Css')
 
-
 class TextColor(RootModel[str]):
     root: str = Field(..., max_length=15, min_length=4, title='Text Color')
-
 
 class TextShadowColor(RootModel[str]):
     root: str = Field(..., max_length=15, min_length=0, title='Text Shadow Color')
 
-
 class BackgroundColor(RootModel[str]):
     root: str = Field(..., max_length=15, min_length=0, title='Background Color')
-
 
 class BackgroundOpacity(RootModel[float]):
     root: float = Field(..., ge=0.0, le=1.0, title='Background Opacity')
 
-
 class BorderWidth(RootModel[int]):
     root: int = Field(..., ge=0, le=10, title='Border Width')
-
 
 class BorderColor(RootModel[str]):
     root: str = Field(..., max_length=15, min_length=0, title='Border Color')
 
-
 class BorderRadius(RootModel[int]):
     root: int = Field(..., ge=0, le=50, title='Border Radius')
-
 
 class MessageFadeDurationSeconds(RootModel[int]):
     root: int = Field(..., ge=0, le=3600, title='Message Fade Duration Seconds')
 
-
 class MessageDelaySeconds(RootModel[int]):
     root: int = Field(..., ge=0, le=10, title='Message Delay Seconds')
-
-
-class Providers271(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers27(RootModel[list[Literal['all'] | Providers271]]):
-    root: list[Literal['all'] | Providers271] = Field(..., title='Providers')
-
 
 class ChatWidgetSettingsUpdate(BaseModel):
     size: Size | None = None
@@ -2725,11 +2090,10 @@ class ChatWidgetSettingsUpdate(BaseModel):
     provider_logo: bool | None = Field(None, title='Provider Logo')
     badges: bool | None = Field(None, title='Badges')
     message_order: MessageOrder | None = Field(None, title='Message Order')
-    providers: Providers27 | None = Field(None, title='Providers')
+    providers: ProviderList | None = Field(None, title='Provider')
     style_type: str | None = Field(None, title='Style Type')
     entrance_animation_type: str | None = Field(None, title='Entrance Animation Type')
     custom_css: str | None = Field(None, title='Custom Css')
-
 
 class ChatWidgetSize(Enum):
     xxs = 'xxs'
@@ -2740,24 +2104,6 @@ class ChatWidgetSize(Enum):
     xl = 'xl'
     xxl = 'xxl'
     xxxl = 'xxxl'
-
-
-class Providers281(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers28(RootModel[list[Literal['all'] | Providers281]]):
-    root: list[Literal['all'] | Providers281] = Field(..., title='Providers')
-
 
 class Settings17(BaseModel):
     size: Size | None = None
@@ -2780,36 +2126,20 @@ class Settings17(BaseModel):
     provider_logo: bool | None = Field(None, title='Provider Logo')
     badges: bool | None = Field(None, title='Badges')
     message_order: MessageOrder | None = Field(None, title='Message Order')
-    providers: Providers28 | None = Field(None, title='Providers')
+    providers: ProviderList | None = Field(None, title='Provider')
     style_type: str | None = Field(None, title='Style Type')
     entrance_animation_type: str | None = Field(None, title='Entrance Animation Type')
     custom_css: str | None = Field(None, title='Custom Css')
 
-
 class ChatWidgetUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
+    name: FilterName | None = Field(None, title='Name')
     type: Literal['chat_widget'] = Field('chat_widget', title='Type')
     settings: Settings17 | None = None
-
 
 class ActiveMode(Enum):
     always = 'always'
     online = 'online'
     offline = 'offline'
-
-
-class Providers29(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
 
 class Command(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -2829,41 +2159,21 @@ class Command(BaseModel):
     active_to_date: AwareDatetime | None = Field(..., title='Active To Date')
     active_title_patterns: list[str] | None = Field(None, title='Active Title Patterns')
     active_categories: list[str] | None = Field(None, title='Active Categories')
-    providers: list[Literal['all'] | Providers29] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime | None = Field(None, title='Updated At')
-
 
 class Cmd(RootModel[str]):
     root: str = Field(..., max_length=100, min_length=1, pattern='^[a-zA-Z0-9_-]+$')
 
-
 class Pattern(RootModel[str]):
     root: str = Field(..., max_length=100, min_length=1)
-
-
-class AccessLevel8(IntEnum):
-    """
-    0: PUBLIC - 1: SUB - 2: VIP - 7: MOD - 100: EDITOR - 200: ADMIN - 500: OWNER - 1000: GLOBAL_ADMIN
-    """
-
-    integer_0 = 0
-    integer_1 = 1
-    integer_2 = 2
-    integer_7 = 7
-    integer_100 = 100
-    integer_200 = 200
-    integer_500 = 500
-    integer_1000 = 1000
-
 
 class ActiveTitlePattern(RootModel[str]):
     root: str = Field(..., max_length=255, min_length=1)
 
-
 class ActiveCategory(RootModel[str]):
     root: str = Field(..., max_length=255, min_length=1)
-
 
 class CommandCreate(BaseModel):
     cmds: list[Cmd] | None = Field(default_factory=list, max_length=15, title='Cmds')
@@ -2883,10 +2193,10 @@ class CommandCreate(BaseModel):
     access_level: AccessLevel8 | None = Field(
         0,
         description='0: PUBLIC - 1: SUB - 2: VIP - 7: MOD - 100: EDITOR - 200: ADMIN - 500: OWNER - 1000: GLOBAL_ADMIN',
-        title='TAccessLevel',
+        title='AccessLevel',
     )
-    providers: list[Literal['all'] | Providers29] | None = Field(
-        ['all'], min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], min_length=1, title='Provider'
     )
     active_from_date: AwareDatetime | None = Field(None, title='Active From Date')
     active_to_date: AwareDatetime | None = Field(None, title='Active To Date')
@@ -2896,7 +2206,6 @@ class CommandCreate(BaseModel):
     active_categories: list[ActiveCategory] | None = Field(
         default_factory=list, title='Active Categories'
     )
-
 
 class Command1(BaseModel):
     cmds: list[Cmd] | None = Field(default_factory=list, max_length=15, title='Cmds')
@@ -2916,10 +2225,10 @@ class Command1(BaseModel):
     access_level: AccessLevel8 | None = Field(
         0,
         description='0: PUBLIC - 1: SUB - 2: VIP - 7: MOD - 100: EDITOR - 200: ADMIN - 500: OWNER - 1000: GLOBAL_ADMIN',
-        title='TAccessLevel',
+        title='AccessLevel',
     )
-    providers: list[Literal['all'] | Providers29] | None = Field(
-        ['all'], min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], min_length=1, title='Provider'
     )
     active_from_date: AwareDatetime | None = Field(None, title='Active From Date')
     active_to_date: AwareDatetime | None = Field(None, title='Active To Date')
@@ -2930,7 +2239,6 @@ class Command1(BaseModel):
         default_factory=list, title='Active Categories'
     )
 
-
 class CommandTemplate(BaseModel):
     id: UUID = Field(..., title='Id')
     title: str = Field(..., title='Title')
@@ -2939,10 +2247,8 @@ class CommandTemplate(BaseModel):
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime | None = Field(None, title='Updated At')
 
-
 class Description(RootModel[str]):
     root: str = Field(..., max_length=500, min_length=1, title='Description')
-
 
 class Command2(BaseModel):
     cmds: list[Cmd] | None = Field(default_factory=list, max_length=15, title='Cmds')
@@ -2962,10 +2268,10 @@ class Command2(BaseModel):
     access_level: AccessLevel8 | None = Field(
         0,
         description='0: PUBLIC - 1: SUB - 2: VIP - 7: MOD - 100: EDITOR - 200: ADMIN - 500: OWNER - 1000: GLOBAL_ADMIN',
-        title='TAccessLevel',
+        title='AccessLevel',
     )
-    providers: list[Literal['all'] | Providers29] | None = Field(
-        ['all'], min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], min_length=1, title='Provider'
     )
     active_from_date: AwareDatetime | None = Field(None, title='Active From Date')
     active_to_date: AwareDatetime | None = Field(None, title='Active To Date')
@@ -2976,16 +2282,13 @@ class Command2(BaseModel):
         default_factory=list, title='Active Categories'
     )
 
-
 class CommandTemplateCreate(BaseModel):
     title: str = Field(..., max_length=255, min_length=1, title='Title')
     description: Description | None = Field(None, title='Description')
     commands: list[Command2] = Field(..., title='Commands')
 
-
 class Title(RootModel[str]):
     root: str = Field(..., max_length=255, min_length=1, title='Title')
-
 
 class Command3(BaseModel):
     cmds: list[Cmd] | None = Field(default_factory=list, max_length=15, title='Cmds')
@@ -3005,10 +2308,10 @@ class Command3(BaseModel):
     access_level: AccessLevel8 | None = Field(
         0,
         description='0: PUBLIC - 1: SUB - 2: VIP - 7: MOD - 100: EDITOR - 200: ADMIN - 500: OWNER - 1000: GLOBAL_ADMIN',
-        title='TAccessLevel',
+        title='AccessLevel',
     )
-    providers: list[Literal['all'] | Providers29] | None = Field(
-        ['all'], min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], min_length=1, title='Provider'
     )
     active_from_date: AwareDatetime | None = Field(None, title='Active From Date')
     active_to_date: AwareDatetime | None = Field(None, title='Active To Date')
@@ -3019,59 +2322,31 @@ class Command3(BaseModel):
         default_factory=list, title='Active Categories'
     )
 
-
 class CommandTemplateUpdate(BaseModel):
     title: Title | None = Field(None, title='Title')
     description: Description | None = Field(None, title='Description')
     commands: list[Command3] | None = Field(None, title='Commands')
 
-
 class Cmds(RootModel[list[Cmd]]):
     root: list[Cmd] = Field(..., max_length=15, title='Cmds')
-
 
 class Patterns(RootModel[list[Pattern]]):
     root: list[Pattern] = Field(..., max_length=15, title='Patterns')
 
-
 class Response(RootModel[str]):
     root: str = Field(..., max_length=500, min_length=1, title='Response')
-
 
 class GroupName(RootModel[str]):
     root: str = Field(..., max_length=100, min_length=0, title='Group Name')
 
-
 class GlobalCooldown(RootModel[int]):
     root: int = Field(..., ge=0, le=2147483647, title='Global Cooldown')
-
 
 class ChatterCooldown(RootModel[int]):
     root: int = Field(..., ge=0, le=2147483647, title='Chatter Cooldown')
 
-
 class ModCooldown(RootModel[int]):
     root: int = Field(..., ge=0, le=2147483647, title='Mod Cooldown')
-
-
-class Providers341(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers34(RootModel[list[Literal['all'] | Providers341]]):
-    root: list[Literal['all'] | Providers341] = Field(
-        ..., min_length=1, title='Providers'
-    )
-
 
 class CommandUpdate(BaseModel):
     cmds: Cmds | None = Field(None, title='Cmds')
@@ -3085,7 +2360,7 @@ class CommandUpdate(BaseModel):
     enabled: bool | None = Field(None, title='Enabled')
     public: bool | None = Field(None, title='Public')
     access_level: AccessLevel8 | None = None
-    providers: Providers34 | None = Field(None, title='Providers')
+    providers: ProviderList | None = Field(None, title='Provider')
     active_from_date: AwareDatetime | None = Field(None, title='Active From Date')
     active_to_date: AwareDatetime | None = Field(None, title='Active To Date')
     active_title_patterns: list[ActiveTitlePattern] | None = Field(
@@ -3095,19 +2370,8 @@ class CommandUpdate(BaseModel):
         None, title='Active Categories'
     )
 
-
 class ConnectUrl(BaseModel):
     url: str = Field(..., title='Url')
-
-
-class Emote9(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    animated: bool = Field(..., title='Animated')
-    emote_provider: str = Field(..., title='Emote Provider')
-    group: str | None = Field('', title='Group')
-    urls: Urls | None
-
 
 class EmotePart(BaseModel):
     id: str = Field(..., title='Id')
@@ -3116,13 +2380,11 @@ class EmotePart(BaseModel):
     emote_provider: str = Field(..., title='Emote Provider')
     urls: Urls | None
 
-
 class EmotePartRequest(BaseModel):
     id: str = Field(..., title='Id')
     name: str = Field(..., title='Name')
     animated: bool = Field(..., title='Animated')
     emote_provider: str = Field(..., title='Emote Provider')
-
 
 class Error1(BaseModel):
     field: str = Field(..., title='Field')
@@ -3130,26 +2392,11 @@ class Error1(BaseModel):
     type: str = Field(..., title='Type')
     input: Any = Field(None, title='Input')
 
-
 class Error(BaseModel):
     code: int = Field(..., title='Code')
     message: str = Field(..., title='Message')
     type: str = Field(..., title='Type')
     errors: list[Error1] = Field(..., title='Errors')
-
-
-class Providers35(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
 
 class Filter(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -3157,27 +2404,24 @@ class Filter(BaseModel):
     updated_at: AwareDatetime = Field(..., title='Updated At')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
-    providers: list[Literal['all'] | Providers35] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     enabled: bool = Field(..., title='Enabled')
-    exclude_access_level: ExcludeAccessLevel = Field(..., title='TAccessLevel')
+    exclude_access_level: AccessLevel = Field(..., title='AccessLevel')
     warning_enabled: bool = Field(..., title='Warning Enabled')
     warning_message: str = Field(..., title='Warning Message')
     warning_expire_duration: int = Field(..., title='Warning Expire Duration')
     timeout_message: str = Field(..., title='Timeout Message')
     timeout_duration: int = Field(..., title='Timeout Duration')
 
-
 class Action2(Enum):
     warning = 'warning'
     timeout = 'timeout'
-
 
 class FilterMatchResult(BaseModel):
     filter: Filter = Field(..., title='ChatFilterBase')
     matched: bool | None = Field(False, title='Matched')
     action: Action2 | None = Field(None, title='Action')
     sub_id: UUID | None = Field(None, title='Sub Id')
-
 
 class GiftPart(BaseModel):
     id: str = Field(..., title='Id')
@@ -3189,17 +2433,15 @@ class GiftPart(BaseModel):
     animated: bool | None = Field(False, title='Animated')
     image_url: str | None = Field(None, title='Image Url')
 
-
 class GiftPartRequest(BaseModel):
     id: str = Field(..., title='Id')
     name: str = Field(..., title='Name')
-    type: str | Type22 = Field(..., title='Type')
+    type: str | RateLimitType = Field(..., title='Type')
     count: int = Field(..., title='Count')
     count_decimal_place: int | None = Field(0, title='Count Decimal Place')
     count_currency: CountCurrency | None = Field(None, title='Count Currency')
     animated: bool | None = Field(False, title='Animated')
     image_url: str | None = Field(None, title='Image Url')
-
 
 class Giveaway(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -3209,7 +2451,7 @@ class Giveaway(BaseModel):
     title: str = Field(..., title='Title')
     chat_command_id: UUID | None = Field(..., title='Chat Command Id')
     entry_word: str = Field(..., title='Entry Word')
-    providers: list[Providers35 | Literal['all']] = Field(..., title='Providers')
+    providers: list[Provider | Literal['all']] = Field(..., title='Provider')
     active: bool = Field(..., title='Active')
     winner_provider: str | None = Field(..., title='Winner Provider')
     winner_provider_viewer_id: str | None = Field(
@@ -3218,17 +2460,15 @@ class Giveaway(BaseModel):
     winner_name: str | None = Field(..., title='Winner Name')
     winner_display_name: str | None = Field(..., title='Winner Display Name')
 
-
 class GiveawayCreate(BaseModel):
     title: str | None = Field('Giveaway', max_length=255, min_length=1, title='Title')
     entry_word: str | None = Field(
         'giveaway', max_length=255, min_length=1, title='Entry Word'
     )
     active: bool | None = Field(False, title='Active')
-    providers: list[Providers35 | Literal['all']] | None = Field(
-        ['all'], title='Providers'
+    providers: list[Provider | Literal['all']] | None = Field(
+        ['all'], title='Provider'
     )
-
 
 class GiveawayEntry(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -3239,46 +2479,24 @@ class GiveawayEntry(BaseModel):
     name: str = Field(..., title='Name')
     display_name: str = Field(..., title='Display Name')
 
-
 class EntryWord(RootModel[str]):
     root: str = Field(..., max_length=255, min_length=1, title='Entry Word')
-
-
-class Providers381(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers38(RootModel[list[Providers381 | Literal['all']]]):
-    root: list[Providers381 | Literal['all']] = Field(..., title='Providers')
-
 
 class GiveawayUpdate(BaseModel):
     title: Title | None = Field(None, title='Title')
     entry_word: EntryWord | None = Field(None, title='Entry Word')
     active: bool | None = Field(None, title='Active')
-    providers: Providers38 | None = Field(None, title='Providers')
-
+    providers: ProviderList | None = Field(None, title='Provider')
 
 class HealthResponse(BaseModel):
     error: bool = Field(..., title='Error')
     message: str = Field(..., title='Message')
     service: str = Field(..., title='Service')
 
-
 class ImageUrls(BaseModel):
     sm: str = Field(..., title='Sm')
     md: str = Field(..., title='Md')
     lg: str = Field(..., title='Lg')
-
 
 class Snippet(BaseModel):
     """
@@ -3306,8 +2524,7 @@ class Snippet(BaseModel):
         title='Scheduledendtime',
     )
 
-
-class Status2(BaseModel):
+class YouTubeBroadcastStatus(BaseModel):
     """
     Privacy settings and made‑for‑kids flag.
     """
@@ -3324,7 +2541,6 @@ class Status2(BaseModel):
         description='Whether the broadcast is marked as made for kids.',
         title='Selfdeclaredmadeforkids',
     )
-
 
 class MonitorStream(BaseModel):
     """
@@ -3343,7 +2559,6 @@ class MonitorStream(BaseModel):
         description='Delay in milliseconds for the monitor stream.',
         title='Broadcaststreamdelayms',
     )
-
 
 class ContentDetails(BaseModel):
     """
@@ -3388,10 +2603,9 @@ class ContentDetails(BaseModel):
     record_from_start: bool | None = Field(
         None,
         alias='recordFromStart',
-        description='Record the broadcast from its very start.',
+        description='ActivityRecord the broadcast from its very start.',
         title='Recordfromstart',
     )
-
 
 class LiveBroadcastInsert(BaseModel):
     """
@@ -3401,7 +2615,7 @@ class LiveBroadcastInsert(BaseModel):
     snippet: Snippet = Field(
         ..., description='Basic broadcast details.', title='LiveBroadcastInsertSnippet'
     )
-    status: Status2 = Field(
+    status: YouTubeBroadcastStatus = Field(
         ...,
         description='Privacy settings and made‑for‑kids flag.',
         title='LiveBroadcastInsertStatus',
@@ -3411,7 +2625,6 @@ class LiveBroadcastInsert(BaseModel):
         alias='contentDetails',
         description='Additional broadcast behavior settings.',
     )
-
 
 class LiveBroadcastInsertContentDetails(BaseModel):
     """
@@ -3456,10 +2669,9 @@ class LiveBroadcastInsertContentDetails(BaseModel):
     record_from_start: bool | None = Field(
         None,
         alias='recordFromStart',
-        description='Record the broadcast from its very start.',
+        description='ActivityRecord the broadcast from its very start.',
         title='Recordfromstart',
     )
-
 
 class LiveBroadcastInsertSnippet(BaseModel):
     """
@@ -3487,7 +2699,6 @@ class LiveBroadcastInsertSnippet(BaseModel):
         title='Scheduledendtime',
     )
 
-
 class LiveBroadcastInsertStatus(BaseModel):
     """
     Privacy settings and made‑for‑kids flag for the broadcast.
@@ -3506,63 +2717,20 @@ class LiveBroadcastInsertStatus(BaseModel):
         title='Selfdeclaredmadeforkids',
     )
 
-
 class MentionPart(BaseModel):
     user_id: str = Field(..., title='User Id')
     username: str = Field(..., title='Username')
     display_name: str = Field(..., title='Display Name')
-
 
 class MentionPartRequest(BaseModel):
     user_id: str = Field(..., title='User Id')
     username: str = Field(..., title='Username')
     display_name: str = Field(..., title='Display Name')
 
-
 class OAuthCallbackResponse(BaseModel):
     mode: str = Field(..., title='Mode')
     redirect_to: str | None = Field(None, title='Redirect To')
     access_token: str | None = Field(None, title='Access Token')
-
-
-class Type24(Enum):
-    sub = 'sub'
-    resub = 'resub'
-    sub_gift = 'sub_gift'
-    community_sub_gift = 'community_sub_gift'
-    raid = 'raid'
-    charity_donation = 'charity_donation'
-    bits = 'bits'
-    follow = 'follow'
-    points = 'points'
-    twitch_shoutout = 'twitch_shoutout'
-    twitch_watch_streak = 'twitch_watch_streak'
-
-
-class Type25(Enum):
-    new_sponsor_event = 'newSponsorEvent'
-    super_chat_event = 'superChatEvent'
-    super_sticker_event = 'superStickerEvent'
-    membership_gifting_event = 'membershipGiftingEvent'
-    member_milestone_chat_event = 'memberMilestoneChatEvent'
-
-
-class Type26(Enum):
-    tiktok_gift = 'tiktok_gift'
-    tiktok_follow = 'tiktok_follow'
-    tiktok_share = 'tiktok_share'
-    tiktok_like = 'tiktok_like'
-
-
-class Type27(Enum):
-    kick_sub = 'kick_sub'
-    kick_resub = 'kick_resub'
-    kick_gift_subs = 'kick_gift_subs'
-    kick_gift_sub = 'kick_gift_sub'
-    kick_follow = 'kick_follow'
-    kick_kicks_gift = 'kick_kicks_gift'
-    kick_reward_redemption = 'kick_reward_redemption'
-
 
 class SubType3(Enum):
     prime = 'prime'
@@ -3570,46 +2738,16 @@ class SubType3(Enum):
     field_2000 = '2000'
     field_3000 = '3000'
 
-
-class Type28(Enum):
-    text = 'text'
-    emote = 'emote'
-    mention = 'mention'
-    gift = 'gift'
-    date = 'date'
-    link = 'link'
-
-
-class Gift7(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    type: str = Field(..., title='Type')
-    count: int = Field(..., title='Count')
-    count_decimal_place: int | None = Field(0, title='Count Decimal Place')
-    count_currency: CountCurrency | None = Field(None, title='Count Currency')
-    animated: bool | None = Field(False, title='Animated')
-    image_url: str | None = Field(None, title='Image Url')
-
-
-class Emote10(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    animated: bool = Field(..., title='Animated')
-    emote_provider: str = Field(..., title='Emote Provider')
-    urls: Urls | None
-
-
 class MessagePart3(BaseModel):
-    type: Type28 = Field(..., title='Type')
+    type: MessagePartType = Field(..., title='Type')
     text: str = Field(..., title='Text')
-    gift: Gift7 | None = None
-    emote: Emote10 | None = None
-    mention: Mention3 | None = None
+    gift: Gift | None = None
+    emote: Emote | None = None
+    mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
 
-
-class Record(BaseModel):
+class ActivityRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     provider: Provider = Field(..., title='Provider')
@@ -3619,10 +2757,10 @@ class Record(BaseModel):
     viewer_name: str = Field(..., title='Viewer Name')
     viewer_display_name: str = Field(..., title='Viewer Display Name')
     type: (
-        Type24
-        | Type25
-        | Type26
-        | Type27
+        TwitchActivityType
+        | YouTubeActivityType
+        | TikTokActivityType
+        | KickActivityType
         | Literal['streamelements_tip']
         | Literal['streamlabs_donation']
         | str
@@ -3643,34 +2781,25 @@ class Record(BaseModel):
     type_display_name: str = Field(..., title='Type Display Name')
     sub_type_display_name: str = Field(..., title='Sub Type Display Name')
 
-
 class PageCursorActivity(BaseModel):
-    records: list[Record] = Field(..., title='Records')
+    records: list[ActivityRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Type29(Enum):
-    phrase = 'phrase'
-    regex = 'regex'
-
-
-class Record1(BaseModel):
+class BannedTermRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     chat_filter_id: UUID = Field(..., title='Chat Filter Id')
-    type: Type29 = Field(..., title='Type')
+    type: BannedTermType = Field(..., title='Type')
     text: str = Field(..., title='Text')
 
-
 class PageCursorBannedTerm(BaseModel):
-    records: list[Record1] = Field(..., title='Records')
+    records: list[BannedTermRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record2(BaseModel):
+class PublicBotProviderRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     provider: Provider = Field(..., title='Provider')
     provider_channel_id: str | None = Field(..., title='Provider Channel Id')
@@ -3678,15 +2807,13 @@ class Record2(BaseModel):
     name: str | None = Field(..., title='Name')
     scope_needed: bool = Field(..., title='Scope Needed')
 
-
 class PageCursorBotProviderPublic(BaseModel):
-    records: list[Record2] = Field(..., title='Records')
+    records: list[PublicBotProviderRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record3(BaseModel):
+class QuoteRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     number: int = Field(..., title='Number')
@@ -3699,20 +2826,18 @@ class Record3(BaseModel):
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime | None = Field(None, title='Updated At')
 
-
 class PageCursorChannelQuote(BaseModel):
-    records: list[Record3] = Field(..., title='Records')
+    records: list[QuoteRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record4(BaseModel):
+class StreamRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     started_at: AwareDatetime = Field(..., title='Started At')
     duration_seconds: int | None = Field(None, title='Duration Seconds')
-    providers: list[Provider] | None = Field([], title='Providers')
+    providers: list[Provider] | None = Field([], title='Provider')
     avg_viewer_count: int | None = Field(None, title='Avg Viewer Count')
     peak_viewer_count: int | None = Field(None, title='Peak Viewer Count')
     viewer_watched_minutes: int | None = Field(None, title='Viewer Watched Minutes')
@@ -3720,144 +2845,67 @@ class Record4(BaseModel):
     unique_chatter_count: int | None = Field(None, title='Unique Chatter Count')
     chat_viewer_ratio: str | None = Field(..., title='Chat Viewer Ratio')
 
-
 class PageCursorChannelStream(BaseModel):
-    records: list[Record4] = Field(..., title='Records')
+    records: list[StreamRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class AccessLevel13(IntEnum):
-    integer_0 = 0
-    integer_1 = 1
-    integer_2 = 2
-    integer_7 = 7
-    integer_100 = 100
-    integer_200 = 200
-    integer_500 = 500
-    integer_1000 = 1000
-
-
-class Record5(BaseModel):
+class ChannelUserAccessRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     user: User = Field(..., title='User')
     channel_id: UUID = Field(..., title='Channel Id')
-    access_level: AccessLevel13 = Field(..., title='TAccessLevel')
-
+    access_level: AccessLevel = Field(..., title='AccessLevel')
 
 class PageCursorChannelUserAccessLevelWithUser(BaseModel):
-    records: list[Record5] = Field(..., title='Records')
+    records: list[ChannelUserAccessRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record6(BaseModel):
+class ChannelUserInviteRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
-    access_level: AccessLevel13 = Field(..., title='TAccessLevel')
+    access_level: AccessLevel = Field(..., title='AccessLevel')
     created_at: AwareDatetime = Field(..., title='Created At')
     expires_at: AwareDatetime = Field(..., title='Expires At')
     is_expired: bool = Field(..., title='Is Expired')
     invite_link: str = Field(..., title='Invite Link')
 
-
 class PageCursorChannelUserInvite(BaseModel):
-    records: list[Record6] = Field(..., title='Records')
+    records: list[ChannelUserInviteRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class UserAccessLevel1(BaseModel):
-    id: UUID = Field(..., title='Id')
-    user_id: UUID = Field(..., title='User Id')
-    channel_id: UUID = Field(..., title='Channel Id')
-    access_level: AccessLevel13 = Field(..., title='TAccessLevel')
-
-
-class BotProvider2(BaseModel):
-    id: UUID = Field(..., title='Id')
-    provider: Provider = Field(..., title='Provider')
-    provider_channel_id: str | None = Field(..., title='Provider Channel Id')
-    scope: str | None = Field(..., title='Scope')
-    name: str | None = Field(..., title='Name')
-    scope_needed: bool = Field(..., title='Scope Needed')
-
-
-class ChannelProvider1(BaseModel):
-    id: UUID = Field(..., title='Id')
-    channel_id: UUID = Field(..., title='Channel Id')
-    provider: Provider = Field(..., title='Provider')
-    provider_channel_id: str | None = Field(..., title='Provider Channel Id')
-    provider_channel_name: str | None = Field(..., title='Provider Channel Name')
-    provider_channel_display_name: str | None = Field(
-        ..., title='Provider Channel Display Name'
-    )
-    scope: str | None = Field(..., title='Scope')
-    stream_title: str | None = Field(..., title='Stream Title')
-    stream_category: str | None = Field(..., title='Stream Category')
-    stream_tags: list[str] = Field(..., title='Stream Tags')
-    live_stream_id: str | None = Field(..., title='Live Stream Id')
-    stream_live: bool | None = Field(False, title='Stream Live')
-    stream_live_at: AwareDatetime | None = Field(None, title='Stream Live At')
-    stream_chat_id: str | None = Field(None, title='Stream Chat Id')
-    stream_viewer_count: int | None = Field(None, title='Stream Viewer Count')
-    channel_provider_stream_id: UUID | None = Field(
-        ..., title='Channel Provider Stream Id'
-    )
-    state: dict[str, Any] | None = Field(..., title='State')
-    bot_provider: BotProvider2 | None
-    scope_needed: bool = Field(..., title='Scope Needed')
-
-
-class Record7(BaseModel):
+class ChannelRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     display_name: str = Field(..., title='Display Name')
     created_at: AwareDatetime = Field(..., title='Created At')
     subscription: Subscription | None
     show_on_landing_page: bool | None = Field(False, title='Show On Landing Page')
-    user_access_level: UserAccessLevel1 | None = None
-    channel_providers: list[ChannelProvider1] | None = Field(
-        None, title='Channel Providers'
+    user_access_level: UserAccessLevel | None = None
+    channel_providers: list[ChannelProvider] | None = Field(
+        None, title='Channel Provider'
     )
     features: list[Feature] = Field(..., title='Features')
 
-
 class PageCursorChannel(BaseModel):
-    records: list[Record7] = Field(..., title='Records')
+    records: list[ChannelRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Type30(Enum):
-    poll = 'poll'
-    progress = 'progress'
-    countdown = 'countdown'
-    notice = 'notice'
-
-
-class Status3(Enum):
-    open = 'open'
-    locked = 'locked'
-    completed = 'completed'
-    terminated = 'terminated'
-    archived = 'archived'
-    unknown = 'unknown'
-
-
-class Record8(BaseModel):
+class ChatEventRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     provider: Provider = Field(..., title='Provider')
     provider_channel_id: str = Field(..., title='Provider Channel Id')
     provider_event_id: str = Field(..., title='Provider Event Id')
     name: str = Field(..., title='Name')
-    type: Type30 = Field(..., title='Type')
+    type: ChatEventType = Field(..., title='Type')
     subtype: str | None = Field(None, title='Subtype')
-    status: Status3 = Field(..., title='Status')
+    status: ChatEventStatus = Field(..., title='Status')
     poll_choices: list[PollChoice] | None = Field(None, title='Poll Choices')
     progress_percent: int | None = Field(None, title='Progress Percent')
     created_at: AwareDatetime = Field(..., title='Created At')
@@ -3866,91 +2914,32 @@ class Record8(BaseModel):
     expired: bool | None = Field(False, title='Expired')
     locks_at: AwareDatetime | None = Field(None, title='Locks At')
 
-
 class PageCursorChatEvent(BaseModel):
-    records: list[Record8] = Field(..., title='Records')
+    records: list[ChatEventRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Type31(Enum):
-    message = 'message'
-    notice = 'notice'
-    status = 'status'
-    automod = 'automod'
-
-
 class SubType4(RootModel[str]):
     root: str = Field(..., max_length=100, min_length=1, title='Sub Type')
 
-
-class Type32(Enum):
-    text = 'text'
-    emote = 'emote'
-    mention = 'mention'
-    gift = 'gift'
-    date = 'date'
-    link = 'link'
-
-
-class Gift8(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    type: str = Field(..., title='Type')
-    count: int = Field(..., title='Count')
-    count_decimal_place: int | None = Field(0, title='Count Decimal Place')
-    count_currency: CountCurrency | None = Field(None, title='Count Currency')
-    animated: bool | None = Field(False, title='Animated')
-    image_url: str | None = Field(None, title='Image Url')
-
-
-class Emote11(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    animated: bool = Field(..., title='Animated')
-    emote_provider: str = Field(..., title='Emote Provider')
-    urls: Urls | None
-
-
 class MessagePart4(BaseModel):
-    type: Type32 = Field(..., title='Type')
+    type: MessagePartType = Field(..., title='Type')
     text: str = Field(..., title='Text')
-    gift: Gift8 | None = None
-    emote: Emote11 | None = None
-    mention: Mention3 | None = None
+    gift: Gift | None = None
+    emote: Emote | None = None
+    mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
-
-
-class Gift9(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    type: str = Field(..., title='Type')
-    count: int = Field(..., title='Count')
-    count_decimal_place: int | None = Field(0, title='Count Decimal Place')
-    count_currency: CountCurrency | None = Field(None, title='Count Currency')
-    animated: bool | None = Field(False, title='Animated')
-    image_url: str | None = Field(None, title='Image Url')
-
-
-class Emote12(BaseModel):
-    id: str = Field(..., title='Id')
-    name: str = Field(..., title='Name')
-    animated: bool = Field(..., title='Animated')
-    emote_provider: str = Field(..., title='Emote Provider')
-    urls: Urls | None
-
 
 class NoticeMessagePart2(BaseModel):
-    type: Type32 = Field(..., title='Type')
+    type: MessagePartType = Field(..., title='Type')
     text: str = Field(..., title='Text')
-    gift: Gift9 | None = None
-    emote: Emote12 | None = None
-    mention: Mention3 | None = None
+    gift: Gift | None = None
+    emote: Emote | None = None
+    mention: Mention | None = None
     date: AwareDatetime | None = Field(None, title='Date')
     url: str | None = Field(None, title='Url')
-
 
 class Parent2(BaseModel):
     provider_message_id: str = Field(..., title='Provider Message Id')
@@ -3959,10 +2948,9 @@ class Parent2(BaseModel):
     viewer_name: str = Field(..., title='Viewer Name')
     viewer_display_name: str = Field(..., title='Viewer Display Name')
 
-
-class Record9(BaseModel):
+class ChatMessageRecord(BaseModel):
     id: UUID = Field(..., title='Id')
-    type: Type31 = Field(..., title='Type')
+    type: ChatMessageRecordType = Field(..., title='Type')
     sub_type: SubType4 | None = Field(None, title='Sub Type')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime | None = Field(None, title='Updated At')
@@ -4001,41 +2989,11 @@ class Record9(BaseModel):
     )
     parent: Parent2 | None = None
 
-
 class PageCursorChatMessage(BaseModel):
-    records: list[Record9] = Field(..., title='Records')
+    records: list[ChatMessageRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
-
-
-class AccessLevel16(IntEnum):
-    """
-    0: PUBLIC - 1: SUB - 2: VIP - 7: MOD - 100: EDITOR - 200: ADMIN - 500: OWNER - 1000: GLOBAL_ADMIN
-    """
-
-    integer_0 = 0
-    integer_1 = 1
-    integer_2 = 2
-    integer_7 = 7
-    integer_100 = 100
-    integer_200 = 200
-    integer_500 = 500
-    integer_1000 = 1000
-
-
-class Providers39(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
 
 class Command4(BaseModel):
     cmds: list[Cmd] | None = Field(default_factory=list, max_length=15, title='Cmds')
@@ -4052,13 +3010,13 @@ class Command4(BaseModel):
     active_mode: ActiveMode | None = Field('always', title='Active Mode')
     enabled: bool | None = Field(True, title='Enabled')
     public: bool | None = Field(True, title='Public')
-    access_level: AccessLevel16 | None = Field(
+    access_level: AccessLevel | None = Field(
         0,
         description='0: PUBLIC - 1: SUB - 2: VIP - 7: MOD - 100: EDITOR - 200: ADMIN - 500: OWNER - 1000: GLOBAL_ADMIN',
-        title='TAccessLevel',
+        title='AccessLevel',
     )
-    providers: list[Literal['all'] | Providers39] | None = Field(
-        ['all'], min_length=1, title='Providers'
+    providers: list[Literal['all'] | Provider] | None = Field(
+        ['all'], min_length=1, title='Provider'
     )
     active_from_date: AwareDatetime | None = Field(None, title='Active From Date')
     active_to_date: AwareDatetime | None = Field(None, title='Active To Date')
@@ -4069,8 +3027,7 @@ class Command4(BaseModel):
         default_factory=list, title='Active Categories'
     )
 
-
-class Record10(BaseModel):
+class CommandTemplateRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     title: str = Field(..., title='Title')
     description: str | None = Field(..., title='Description')
@@ -4078,15 +3035,13 @@ class Record10(BaseModel):
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime | None = Field(None, title='Updated At')
 
-
 class PageCursorCommandTemplate(BaseModel):
-    records: list[Record10] = Field(..., title='Records')
+    records: list[CommandTemplateRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record11(BaseModel):
+class CommandRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     cmds: list[str] = Field(..., title='Cmds')
@@ -4104,19 +3059,17 @@ class Record11(BaseModel):
     active_to_date: AwareDatetime | None = Field(..., title='Active To Date')
     active_title_patterns: list[str] | None = Field(None, title='Active Title Patterns')
     active_categories: list[str] | None = Field(None, title='Active Categories')
-    providers: list[Literal['all'] | Providers39] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime | None = Field(None, title='Updated At')
 
-
 class PageCursorCommand(BaseModel):
-    records: list[Record11] = Field(..., title='Records')
+    records: list[CommandRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record12(BaseModel):
+class GiveawayEntryRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     created_at: AwareDatetime = Field(..., title='Created At')
     channel_giveaway_id: UUID = Field(..., title='Channel Giveaway Id')
@@ -4125,15 +3078,13 @@ class Record12(BaseModel):
     name: str = Field(..., title='Name')
     display_name: str = Field(..., title='Display Name')
 
-
 class PageCursorGiveawayEntry(BaseModel):
-    records: list[Record12] = Field(..., title='Records')
+    records: list[GiveawayEntryRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record13(BaseModel):
+class GiveawayRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime = Field(..., title='Updated At')
@@ -4141,7 +3092,7 @@ class Record13(BaseModel):
     title: str = Field(..., title='Title')
     chat_command_id: UUID | None = Field(..., title='Chat Command Id')
     entry_word: str = Field(..., title='Entry Word')
-    providers: list[Providers39 | Literal['all']] = Field(..., title='Providers')
+    providers: list[Provider | Literal['all']] = Field(..., title='Provider')
     active: bool = Field(..., title='Active')
     winner_provider: str | None = Field(..., title='Winner Provider')
     winner_provider_viewer_id: str | None = Field(
@@ -4150,15 +3101,13 @@ class Record13(BaseModel):
     winner_name: str | None = Field(..., title='Winner Name')
     winner_display_name: str | None = Field(..., title='Winner Display Name')
 
-
 class PageCursorGiveaway(BaseModel):
-    records: list[Record13] = Field(..., title='Records')
+    records: list[GiveawayRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record14(BaseModel):
+class QueueViewerRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_queue_id: UUID = Field(..., title='Channel Queue Id')
     position: int = Field(..., title='Position')
@@ -4167,47 +3116,40 @@ class Record14(BaseModel):
     display_name: str = Field(..., title='Display Name')
     created_at: AwareDatetime = Field(..., title='Created At')
 
-
 class PageCursorQueueViewer(BaseModel):
-    records: list[Record14] = Field(..., title='Records')
+    records: list[QueueViewerRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record15(BaseModel):
+class QueueRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
     created_at: AwareDatetime = Field(..., title='Created At')
 
-
 class PageCursorQueue(BaseModel):
-    records: list[Record15] = Field(..., title='Records')
+    records: list[QueueRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record16(BaseModel):
+class StreamCategoryRecord(BaseModel):
     id: str | None = Field(None, title='Id')
     name: str = Field(..., title='Name')
     thumbnail_url: str | None = Field(None, title='Thumbnail Url')
 
-
 class PageCursorStreamCategory(BaseModel):
-    records: list[Record16] = Field(..., title='Records')
+    records: list[StreamCategoryRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Status4(Enum):
+class TaskStatus(Enum):
     running = 'RUNNING'
     finished = 'FINISHED'
     failed = 'FAILED'
     cancelled = 'CANCELLED'
-
 
 class Log(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -4217,8 +3159,7 @@ class Log(BaseModel):
     message: str = Field(..., title='Message')
     extra: dict[str, Any] | None = Field(..., title='Extra')
 
-
-class Record17(BaseModel):
+class TaskRecord(BaseModel):
     path: str = Field(..., title='Path')
     id: UUID = Field(..., title='Id')
     work_id: UUID = Field(..., title='Work Id')
@@ -4229,7 +3170,7 @@ class Record17(BaseModel):
     timeout_seconds: int | None = Field(..., title='Timeout Seconds')
     tries: int = Field(..., title='Tries')
     max_tries: int = Field(..., title='Max Tries')
-    status: Status4 = Field(..., title='TaskStatus')
+    status: TaskStatus = Field(..., title='TaskStatus')
     request_data: dict[str, Any] | None = Field(..., title='Request Data')
     response_data: dict[str, Any] | None = Field(..., title='Response Data')
     error: str | None = Field(..., title='Error')
@@ -4237,20 +3178,17 @@ class Record17(BaseModel):
     unique: bool = Field(..., title='Unique')
     logs: list[Log] | None = Field(None, title='Logs')
 
-
 class PageCursorTask(BaseModel):
-    records: list[Record17] = Field(..., title='Records')
+    records: list[TaskRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
-
 
 class PickMode(Enum):
     order = 'order'
     random = 'random'
 
-
-class Record18(BaseModel):
+class TimerRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     created_at: AwareDatetime = Field(..., title='Created At')
@@ -4260,7 +3198,7 @@ class Record18(BaseModel):
     interval: int = Field(..., description='Minutes', title='Interval')
     enabled: bool = Field(..., title='Enabled')
     next_run_at: AwareDatetime = Field(..., title='Next Run At')
-    providers: list[Literal['all'] | Providers39] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     pick_mode: PickMode = Field(..., title='Pick Mode')
     active_mode: ActiveMode = Field(..., title='Active Mode')
     last_message_index: int | None = Field(..., title='Last Message Index')
@@ -4270,13 +3208,11 @@ class Record18(BaseModel):
     active_categories: list[str] | None = Field(None, title='Active Categories')
     active_chat_messages: int | None = Field(None, title='Active Chat Messages')
 
-
 class PageCursorTimer(BaseModel):
-    records: list[Record18] = Field(..., title='Records')
+    records: list[TimerRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
-
 
 class ChannelProviderStream1(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -4292,41 +3228,35 @@ class ChannelProviderStream1(BaseModel):
     viewer_watched_minutes: int | None = Field(..., title='Viewer Watched Minutes')
     chat_message_count: int | None = Field(..., title='Chat Message Count')
 
-
 class ViewerWatchtime(BaseModel):
     channel_provider_stream_id: UUID = Field(..., title='Channel Provider Stream Id')
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     watchtime: int = Field(..., title='Watchtime')
 
-
-class Record19(BaseModel):
+class ViewerStreamRecord(BaseModel):
     channel_provider_stream: ChannelProviderStream1 = Field(
         ..., title='ChannelProviderStream'
     )
     viewer_watchtime: ViewerWatchtime = Field(..., title='StreamViewerWatchtime')
 
-
 class PageCursorViewerStream(BaseModel):
-    records: list[Record19] = Field(..., title='Records')
+    records: list[ViewerStreamRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
 
-
-class Record20(BaseModel):
+class WidgetBaseRecord(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
     created_at: AwareDatetime = Field(..., title='Created At')
     updated_at: AwareDatetime = Field(..., title='Updated At')
 
-
 class PageCursorWidgetBase(BaseModel):
-    records: list[Record20] = Field(..., title='Records')
+    records: list[WidgetBaseRecord] = Field(..., title='Records')
     lookup_data: dict[str, dict[str, Any]] | None = Field(None, title='Lookup Data')
     cursor: str | None = Field(None, title='Cursor')
     total: int | None = Field(None, title='Total')
-
 
 class ProviderViewer(BaseModel):
     provider: Provider = Field(..., title='Provider')
@@ -4334,21 +3264,17 @@ class ProviderViewer(BaseModel):
     name: str = Field(..., title='Name')
     display_name: str = Field(..., title='Display Name')
 
-
 class Queue(BaseModel):
     id: UUID = Field(..., title='Id')
     channel_id: UUID = Field(..., title='Channel Id')
     name: str = Field(..., title='Name')
     created_at: AwareDatetime = Field(..., title='Created At')
 
-
 class QueueCreate(BaseModel):
     name: str = Field(..., max_length=255, min_length=1, title='Name')
 
-
 class QueueUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
-
+    name: FilterName | None = Field(None, title='Name')
 
 class QueueViewer(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -4359,12 +3285,10 @@ class QueueViewer(BaseModel):
     display_name: str = Field(..., title='Display Name')
     created_at: AwareDatetime = Field(..., title='Created At')
 
-
 class QueueViewerCreate(BaseModel):
     provider: Provider = Field(..., title='Provider')
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     display_name: str = Field(..., title='Display Name')
-
 
 class RouletteSettings(BaseModel):
     channel_id: UUID = Field(..., title='Channel Id')
@@ -4375,7 +3299,6 @@ class RouletteSettings(BaseModel):
     allin_lose_message: str = Field(..., title='Allin Lose Message')
     min_bet: int = Field(..., title='Min Bet')
     max_bet: int = Field(..., title='Max Bet')
-
 
 class RouletteSettingsUpdate(BaseModel):
     win_chance: int | None = Field(45, ge=0, le=100, title='Win Chance')
@@ -4406,7 +3329,6 @@ class RouletteSettingsUpdate(BaseModel):
     min_bet: int | None = Field(5, ge=0, title='Min Bet')
     max_bet: int | None = Field(0, ge=0, title='Max Bet')
 
-
 class SlotsSettings(BaseModel):
     channel_id: UUID = Field(..., title='Channel Id')
     emotes: list[str] = Field(..., title='Emotes')
@@ -4418,7 +3340,6 @@ class SlotsSettings(BaseModel):
     allin_lose_message: str = Field(..., title='Allin Lose Message')
     min_bet: int = Field(..., title='Min Bet')
     max_bet: int = Field(..., title='Max Bet')
-
 
 class SlotsSettingsUpdate(BaseModel):
     emotes: list[str] | None = Field(
@@ -4453,12 +3374,10 @@ class SlotsSettingsUpdate(BaseModel):
         title='Allin Lose Message',
     )
 
-
 class StreamCategory(BaseModel):
     id: str | None = Field(None, title='Id')
     name: str = Field(..., title='Name')
     thumbnail_url: str | None = Field(None, title='Thumbnail Url')
-
 
 class StreamStatsPeriod(BaseModel):
     period: str = Field(..., title='Period')
@@ -4471,12 +3390,10 @@ class StreamStatsPeriod(BaseModel):
     unique_chatter_count: int = Field(..., title='Unique Chatter Count')
     chat_viewer_ratio: str = Field(..., title='Chat Viewer Ratio')
 
-
 class StreamViewerWatchtime(BaseModel):
     channel_provider_stream_id: UUID = Field(..., title='Channel Provider Stream Id')
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     watchtime: int = Field(..., title='Watchtime')
-
 
 class SubError(BaseModel):
     field: str = Field(..., title='Field')
@@ -4484,21 +3401,8 @@ class SubError(BaseModel):
     type: str = Field(..., title='Type')
     input: Any = Field(None, title='Input')
 
-
 class SubscriptionType(Enum):
     pro_plus = 'pro_plus'
-
-
-class TAccessLevel(IntEnum):
-    integer_0 = 0
-    integer_1 = 1
-    integer_2 = 2
-    integer_7 = 7
-    integer_100 = 100
-    integer_200 = 200
-    integer_500 = 500
-    integer_1000 = 1000
-
 
 class Task(BaseModel):
     path: str = Field(..., title='Path')
@@ -4511,14 +3415,13 @@ class Task(BaseModel):
     timeout_seconds: int | None = Field(..., title='Timeout Seconds')
     tries: int = Field(..., title='Tries')
     max_tries: int = Field(..., title='Max Tries')
-    status: Status4 = Field(..., title='TaskStatus')
+    status: TaskStatus = Field(..., title='TaskStatus')
     request_data: dict[str, Any] | None = Field(..., title='Request Data')
     response_data: dict[str, Any] | None = Field(..., title='Response Data')
     error: str | None = Field(..., title='Error')
     worker: str = Field(..., title='Worker')
     unique: bool = Field(..., title='Unique')
     logs: list[Log] | None = Field(None, title='Logs')
-
 
 class TaskLog(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -4527,14 +3430,6 @@ class TaskLog(BaseModel):
     level: str = Field(..., title='Level')
     message: str = Field(..., title='Message')
     extra: dict[str, Any] | None = Field(..., title='Extra')
-
-
-class TaskStatus(Enum):
-    running = 'RUNNING'
-    finished = 'FINISHED'
-    failed = 'FAILED'
-    cancelled = 'CANCELLED'
-
 
 class Timer(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -4546,7 +3441,7 @@ class Timer(BaseModel):
     interval: int = Field(..., description='Minutes', title='Interval')
     enabled: bool = Field(..., title='Enabled')
     next_run_at: AwareDatetime = Field(..., title='Next Run At')
-    providers: list[Literal['all'] | Providers39] = Field(..., title='Providers')
+    providers: list[Literal['all'] | Provider] = Field(..., title='Provider')
     pick_mode: PickMode = Field(..., title='Pick Mode')
     active_mode: ActiveMode = Field(..., title='Active Mode')
     last_message_index: int | None = Field(..., title='Last Message Index')
@@ -4556,10 +3451,8 @@ class Timer(BaseModel):
     active_categories: list[str] | None = Field(None, title='Active Categories')
     active_chat_messages: int | None = Field(None, title='Active Chat Messages')
 
-
 class Message1(RootModel[str]):
     root: str = Field(..., max_length=500, min_length=1)
-
 
 class TimerCreate(BaseModel):
     name: str = Field(..., max_length=255, min_length=1, title='Name')
@@ -4568,8 +3461,8 @@ class TimerCreate(BaseModel):
     )
     interval: int | None = Field(30, description='Minutes', ge=1, title='Interval')
     enabled: bool | None = Field(True, title='Enabled')
-    providers: list[Literal['all'] | Providers39] | None = Field(
-        ['all'], max_length=255, min_length=1, title='Providers'
+    providers: ProviderList | None = Field(
+        ['all'], max_length=255, min_length=1, title='Provider'
     )
     pick_mode: PickMode | None = Field('order', title='Pick Mode')
     active_mode: ActiveMode | None = Field('always', title='Active Mode')
@@ -4583,40 +3476,18 @@ class TimerCreate(BaseModel):
     )
     active_chat_messages: int | None = Field(None, title='Active Chat Messages')
 
-
 class Messages(RootModel[list[Message1]]):
     root: list[Message1] = Field(..., max_length=100, min_length=1, title='Messages')
-
 
 class Interval(RootModel[int]):
     root: int = Field(..., description='Minutes', ge=1, title='Interval')
 
-
-class Providers451(Enum):
-    twitch = 'twitch'
-    discord = 'discord'
-    youtube = 'youtube'
-    spotify = 'spotify'
-    tiktok = 'tiktok'
-    kick = 'kick'
-    field_7tv = '7tv'
-    betterttv = 'betterttv'
-    streamelements = 'streamelements'
-    streamlabs = 'streamlabs'
-
-
-class Providers45(RootModel[list[Literal['all'] | Providers451]]):
-    root: list[Literal['all'] | Providers451] = Field(
-        ..., max_length=255, min_length=1, title='Providers'
-    )
-
-
 class TimerUpdate(BaseModel):
-    name: Name4 | None = Field(None, title='Name')
+    name: FilterName | None = Field(None, title='Name')
     messages: Messages | None = Field(None, title='Messages')
     interval: Interval | None = Field(None, title='Interval')
     enabled: bool | None = Field(None, title='Enabled')
-    providers: Providers45 | None = Field(None, title='Providers')
+    providers: Providers45 | None = Field(None, title='Provider')
     pick_mode: PickMode | None = Field(None, title='Pick Mode')
     active_mode: ActiveMode | None = Field(None, title='Active Mode')
     active_from_date: AwareDatetime | None = Field(None, title='Active From Date')
@@ -4629,7 +3500,6 @@ class TimerUpdate(BaseModel):
     )
     active_chat_messages: int | None = Field(None, title='Active Chat Messages')
 
-
 class UserProviderPublic(BaseModel):
     id: UUID = Field(..., title='Id')
     provider: Provider = Field(..., title='Provider')
@@ -4638,13 +3508,11 @@ class UserProviderPublic(BaseModel):
     scope: str | None = Field(..., title='Scope')
     chat_scope_needed: bool = Field(..., title='Chat Scope Needed')
 
-
 class UserPublic(BaseModel):
     id: UUID = Field(..., title='Id')
     username: str = Field(..., title='Username')
     display_name: str = Field(..., title='Display Name')
     default_channel_id: UUID | None = Field(None, title='Default Channel Id')
-
 
 class UserSendMessageCreate(BaseModel):
     user_provider_id: UUID = Field(..., title='User Provider Id')
@@ -4653,7 +3521,6 @@ class UserSendMessageCreate(BaseModel):
     reply_provider_message_id: str | None = Field(
         None, title='Reply Provider Message Id'
     )
-
 
 class UserSettings(BaseModel):
     activity_feed_not_types: list[str] | None = Field(
@@ -4666,7 +3533,6 @@ class UserSettings(BaseModel):
         False, title='Activity Feed Read Indicator'
     )
     view_count: bool | None = Field(True, title='View Count')
-
 
 class ChannelProviderStream2(BaseModel):
     id: UUID = Field(..., title='Id')
@@ -4682,13 +3548,11 @@ class ChannelProviderStream2(BaseModel):
     viewer_watched_minutes: int | None = Field(..., title='Viewer Watched Minutes')
     chat_message_count: int | None = Field(..., title='Chat Message Count')
 
-
 class ViewerStream(BaseModel):
     channel_provider_stream: ChannelProviderStream2 = Field(
         ..., title='ChannelProviderStream'
     )
     viewer_watchtime: ViewerWatchtime = Field(..., title='StreamViewerWatchtime')
-
 
 class WidgetBase(BaseModel):
     id: UUID = Field(..., title='Id')
