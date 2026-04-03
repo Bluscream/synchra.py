@@ -106,7 +106,8 @@ python -m pytest tests/
 Synchra v2.0 supports sophisticated member management for your channels:
 
 ```python
-from synchra.models.resources import AccessLevel
+from synchra import Synchra
+from synchra.models import AccessLevel
 
 # List current active invites
 invites = await client.channels.list_invites(channel_id)

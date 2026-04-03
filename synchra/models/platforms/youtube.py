@@ -58,9 +58,6 @@ class LiveBroadcastInsert(SynchraBaseModel):
     status: YouTubeBroadcastStatus = Field(..., title='LiveBroadcastInsertStatus')
     content_details: ContentDetails | None = Field(None, alias='contentDetails')
 
-class BodyBanUserApi2ChannelsChannelIdYoutubeChannelProviderIdBanPost(SynchraBaseModel):
+class YouTubeBanRequest(SynchraBaseModel):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     duration_seconds: int | None = Field(None, title='Duration Seconds')
-
-# Aliases for cleaner usage
-YouTubeBanUserRequest = BodyBanUserApi2ChannelsChannelIdYoutubeChannelProviderIdBanPost

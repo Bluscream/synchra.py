@@ -35,10 +35,7 @@ class KickMessageSubType(Enum):
     first_message = 'first_message'
     returning_chatter = 'returning_chatter'
 
-class BodyBanUserApi2ChannelsChannelIdKickChannelProviderIdBanPost(SynchraBaseModel):
+class KickBanRequest(SynchraBaseModel):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     duration_seconds: int | None = Field(None, title='Duration Seconds')
     reason: str | None = Field(None, title='Reason')
-
-# Aliases for cleaner usage
-KickBanUserRequest = BodyBanUserApi2ChannelsChannelIdKickChannelProviderIdBanPost

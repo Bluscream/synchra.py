@@ -99,36 +99,6 @@ class SlotsSettingsUpdate(SynchraBaseModel):
     win_message: str | None = Field(None, title='Win Message')
     lose_message: str | None = Field(None, title='Lose Message')
 
-# API Body Models
-class BodyAddVIPUserApi2ChannelsChannelIdTwitchChannelProviderIdVipsPost(SynchraBaseModel):
-    provider_viewer_id: str = Field(..., title='Provider Viewer Id')
-
-class BodyBanUserApi2ChannelsChannelIdKickChannelProviderIdBanPost(SynchraBaseModel):
-    provider_viewer_id: str = Field(..., title='Provider Viewer Id')
-    duration_seconds: int | None = Field(None, title='Duration Seconds')
-    reason: str | None = Field(None, title='Reason')
-
-class BodyBanUserApi2ChannelsChannelIdTwitchChannelProviderIdBanPost(SynchraBaseModel):
-    provider_viewer_id: str = Field(..., title='Provider Viewer Id')
-    duration_seconds: int | None = Field(None, title='Duration Seconds')
-    reason: str | None = Field(None, title='Reason')
-
-class BodyBanUserApi2ChannelsChannelIdYoutubeChannelProviderIdBanPost(SynchraBaseModel):
-    provider_viewer_id: str = Field(..., title='Provider Viewer Id')
-    duration_seconds: int | None = Field(None, title='Duration Seconds')
-
-class BodyEmulateChannelChatMessageApi2TwitchEventsubEmulateChannelChatMessagePost(SynchraBaseModel):
-    fragments: list[Fragment] = Field(..., title='Fragments')
-    cheer: Cheer | None = None
-    message_type: MessageType | None = Field('text', title='Message Type')
-    source_provider_channel_id: str | None = Field(None, title='Source Provider ChannelRecord Id')
-    source_provider_channel_name: str | None = Field(None, title='Source Provider ChannelRecord Name')
-
-class BodyRaidChannelApi2ChannelsChannelIdTwitchChannelProviderIdRaidPost(SynchraBaseModel):
-    to_provider_channel_id: str = Field(..., title='To Provider ChannelRecord Id')
-
-class BodyShoutoutUserApi2ChannelsChannelIdTwitchChannelProviderIdShoutoutPost(SynchraBaseModel):
-    to_provider_channel_id: str = Field(..., title='To Provider ChannelRecord Id')
 
 class UserSendMessageCreate(SynchraBaseModel):
     user_provider_id: UUID = Field(..., title='User Provider Id')

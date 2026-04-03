@@ -136,18 +136,23 @@ class MessageType(Enum):
     first_message = 'first_message'
     returning_chatter = 'returning_chatter'
 
-class BodyBanUserApi2ChannelsChannelIdTwitchChannelProviderIdBanPost(SynchraBaseModel):
+class TwitchBanRequest(SynchraBaseModel):
     provider_viewer_id: str = Field(..., title='Provider Viewer Id')
     duration_seconds: int | None = Field(None, title='Duration Seconds')
     reason: str | None = Field(None, title='Reason')
 
-class BodyEmulateChannelChatMessageApi2TwitchEventsubEmulateChannelChatMessagePost(SynchraBaseModel):
+class TwitchEmulateChatMessageRequest(SynchraBaseModel):
     fragments: list[Fragment] = Field(..., title='Fragments')
     cheer: Cheer | None = None
     message_type: MessageType | None = Field('text', title='Message Type')
     source_provider_channel_id: str | None = Field(None, title='Source Provider Channel Id')
     source_provider_channel_name: str | None = Field(None, title='Source Provider Channel Name')
 
-# Aliases for cleaner usage
-TwitchBanUserRequest = BodyBanUserApi2ChannelsChannelIdTwitchChannelProviderIdBanPost
-TwitchEmulateChatRequest = BodyEmulateChannelChatMessageApi2TwitchEventsubEmulateChannelChatMessagePost
+class TwitchAddVIPRequest(SynchraBaseModel):
+    provider_viewer_id: str = Field(..., title='Provider Viewer Id')
+
+class TwitchRaidRequest(SynchraBaseModel):
+    to_provider_channel_id: str = Field(..., title='To Provider Channel Id')
+
+class TwitchShoutoutRequest(SynchraBaseModel):
+    to_provider_channel_id: str = Field(..., title='To Provider Channel Id')
