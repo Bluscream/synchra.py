@@ -62,6 +62,20 @@ if ($version) { $targetVersion = $version }
 
 if ($bump -or $version -or $doAll) { Update-Version -newVersion $targetVersion }
 
+# 🧪 Pre-release Testing
+if ($doAll) {
+    Write-Host "Running SDK test suite..." -ForegroundColor Cyan
+    Push-Location $repoRoot
+    try {
+        & python -m pytest tests/ --quiet
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "SDK test suite failed! Aborting build process."
+            exit 1
+        }
+    } finally { Pop-Location }
+    Write-Host "SDK tests passed! Proceeding with release..." -ForegroundColor Green
+}
+
 if ($commit -or $doAll) {
     Write-Host "Committing SDK changes..."
     Push-Location $repoRoot
