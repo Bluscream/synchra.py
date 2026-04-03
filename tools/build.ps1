@@ -5,6 +5,7 @@ param(
     [string]$version,
     [switch]$bump,
     [switch]$publish,
+    [switch]$build,
     [switch]$pre
 )
 
@@ -97,14 +98,21 @@ if ($push -or $doAll) {
     } finally { Pop-Location }
 }
 
+if ($publish -or $build -or $doAll) {
+    Write-Host "Building SDK distributions..." -ForegroundColor Cyan
+    Push-Location $repoRoot
+    try {
+        Remove-Item -Path "dist" -Recurse -ErrorAction SilentlyContinue
+        & python -m build
+    } finally { Pop-Location }
+}
+
 if ($publish -or $doAll) {
     Write-Host "Publishing SDK to PyPI..."
     $env:PYPI_TOKEN = [System.Environment]::GetEnvironmentVariable("PYPI_TOKEN", "User")
     Push-Location $repoRoot
     try {
-        Remove-Item -Path "dist" -Recurse -ErrorAction SilentlyContinue
-        python -m build
-        python -m twine upload -u "__token__" -p "$env:PYPI_TOKEN" dist/* --non-interactive --skip-existing
+        & python -m twine upload -u "__token__" -p "$env:PYPI_TOKEN" dist/* --non-interactive --skip-existing
     } finally { Pop-Location }
 }
 
