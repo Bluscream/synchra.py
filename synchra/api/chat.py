@@ -62,7 +62,8 @@ class ChatAPI(APIGroup):
         errors = []
         for i, res in enumerate(results):
             if isinstance(res, Exception):
-                errors.append({"platform": targets[i].provider, "error": str(res)})
+                p_name = getattr(targets[i].provider, 'value', str(targets[i].provider))
+                errors.append({"platform": p_name, "error": str(res)})
             else:
                 success_count += 1
                 

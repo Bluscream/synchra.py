@@ -121,3 +121,4 @@ async def test_send_message_all_partial_failure(http_client, mock_aioresponse):
     assert result["success"] == 1
     assert result["failed"] == 1
     assert len(result["errors"]) == 1
+    assert isinstance(result["errors"][0]["platform"], str)
