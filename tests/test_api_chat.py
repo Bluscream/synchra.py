@@ -2,7 +2,7 @@ import pytest
 from uuid import uuid4, UUID
 from unittest.mock import AsyncMock, patch
 from synchra.api.chat import ChatAPI
-from synchra.models.resources import ChannelProvider, Provider
+from synchra.models import ChannelProvider, Provider
 
 
 def _make_provider(provider_name: str, **overrides) -> ChannelProvider:

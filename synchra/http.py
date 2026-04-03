@@ -6,7 +6,7 @@ from uuid import UUID
 import aiohttp
 from pydantic import BaseModel, ValidationError, TypeAdapter
 
-from .models.resources import Error as SynchraErrorModel
+from .models import Error as SynchraErrorModel
 
 logger = logging.getLogger("synchra.http")
 

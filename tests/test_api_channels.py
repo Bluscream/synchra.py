@@ -1,7 +1,7 @@
 import pytest
 from uuid import uuid4
 from synchra.api.channels import ChannelsAPI
-from synchra.models.resources import ChannelRecord
+from synchra.models import ChannelRecord
 
 @pytest.mark.asyncio
 async def test_list_channels(http_client, mock_aioresponse):

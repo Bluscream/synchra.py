@@ -1,13 +1,16 @@
-from typing import List, Dict, Any
+from typing import List
 from .base import APIGroup
+from ..models import User, UserProviderPublic
 
 class UserAPI(APIGroup):
     """API for managing the authenticated Synchra user account."""
 
-    async def get_info(self) -> Dict[str, Any]:
+    async def get_info(self) -> User:
         """Fetch basic profile info for the current user (ID, username, email)."""
-        return await self._http.get("/user")
+        data = await self._http.get("/user")
+        return User.model_validate(data)
 
-    async def list_providers(self) -> List[Dict[str, Any]]:
+    async def list_providers(self) -> List[UserProviderPublic]:
         """Fetch all linked platform providers for the current user."""
-        return await self._http.get("/user/providers")
+        data = await self._http.get("/user/providers")
+        return [UserProviderPublic.model_validate(p) for p in data]

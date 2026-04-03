@@ -2,7 +2,7 @@ import asyncio
 from typing import Optional, List, Any, Dict
 from uuid import UUID
 from .base import APIGroup
-from ..models.resources import ChannelProvider
+from ..models import ChannelProvider, BroadcastResponse, BroadcastError
 
 class ChatAPI(APIGroup):
     """API for sending chat messages to platforms via Synchra."""
@@ -29,7 +29,7 @@ class ChatAPI(APIGroup):
         message: str, 
         user_provider_id: str,
         providers: Optional[List[ChannelProvider]] = None
-    ) -> Dict[str, Any]:
+    ) -> BroadcastResponse:
         """
         Broadcast a message to all sendable providers linked to a channel.
         
@@ -40,7 +40,7 @@ class ChatAPI(APIGroup):
             providers: Optional pre-fetched list of channel providers.
             
         Returns:
-            Dict containing success and failure counts/exceptions.
+            BroadcastResponse containing success and failure counts/exceptions.
         """
         if providers is None:
             providers = await self._get_list(f"/channels/{channel_id}/providers", ChannelProvider)
@@ -53,7 +53,7 @@ class ChatAPI(APIGroup):
         ]
         
         if not targets:
-            return {"success": 0, "failed": 0, "errors": []}
+            return BroadcastResponse(success=0, failed=0, errors=[])
             
         tasks = [self.send_message(p.id, message, user_provider_id) for p in targets]
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -63,12 +63,12 @@ class ChatAPI(APIGroup):
         for i, res in enumerate(results):
             if isinstance(res, Exception):
                 p_name = getattr(targets[i].provider, 'value', str(targets[i].provider))
-                errors.append({"platform": p_name, "error": str(res)})
+                errors.append(BroadcastError(platform=p_name, error=str(res)))
             else:
                 success_count += 1
                 
-        return {
-            "success": success_count,
-            "failed": len(targets) - success_count,
-            "errors": errors
-        }
+        return BroadcastResponse(
+            success=success_count,
+            failed=len(targets) - success_count,
+            errors=errors
+        )

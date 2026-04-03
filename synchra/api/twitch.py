@@ -2,7 +2,7 @@ from typing import List, Optional, Any
 from uuid import UUID
 
 from .base import APIGroup
-from ..models.resources import (
+from ..models.platforms.twitch import (
     BodyEmulateChannelChatMessageApi2TwitchEventsubEmulateChannelChatMessagePost as EmulateChatData,
     BodyBanUserApi2ChannelsChannelIdTwitchChannelProviderIdBanPost as BanUserBody
 )

@@ -2,14 +2,13 @@ from typing import List, Optional, Any
 from uuid import UUID
 
 from .base import APIGroup
-from ..models.resources import (
+from ..models import (
     ChannelRecord, 
-    ChannelProvider, 
+    # ChannelProvider, # This might be in platforms/twitch.py or similar, or just ChannelRecord
     ActivityRecord,
     PageCursorChannel,
     PageCursorActivity,
-    ChannelUserAccessRecord,
-    ChannelUserAccessRecord,
+    ChannelUserAccessRecord, 
     ChannelUserInviteRecord,
     AccessLevel
 )
