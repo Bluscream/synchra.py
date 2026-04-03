@@ -664,14 +664,14 @@ class BodyStartCommercialApi2ChannelsChannelIdProvidersChannelProviderIdRunComme
 
 
 class AccessLevel(IntEnum):
-    integer_0 = 0
-    integer_1 = 1
-    integer_2 = 2
-    integer_7 = 7
-    integer_100 = 100
-    integer_200 = 200
-    integer_500 = 500
-    integer_1000 = 1000
+    GUEST = 0
+    USER = 1
+    LEVEL_2 = 2
+    MOD = 7
+    EDITOR = 100
+    ADMIN = 200
+    SUPER_ADMIN = 500
+    OWNER = 1000
 
 
 class BodyUpdateChannelUserAccessLevelApi2ChannelsChannelIdUsersAccessChannelUserAccessIdPut(

@@ -21,7 +21,7 @@ class ChatAPI(APIGroup):
             "user_provider_id": str(user_provider_id),
             "message": message
         }
-        await self._http.post("/api/2/chat/messages", json=data)
+        await self._http.post("/chat/messages", json=data)
 
     async def send_message_all(
         self, 
@@ -43,7 +43,7 @@ class ChatAPI(APIGroup):
             Dict containing success and failure counts/exceptions.
         """
         if providers is None:
-            providers = await self._get_list(f"/api/2/channels/{channel_id}/providers", ChannelProvider)
+            providers = await self._get_list(f"/channels/{channel_id}/providers", ChannelProvider)
             
         # Broadcast to all platforms except those that don't support chat sending (e.g. TikTok)
         platform_send_blacklist = {'tiktok'}

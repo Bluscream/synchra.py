@@ -18,7 +18,7 @@ class YouTubeAPI(APIGroup):
             data["contentDetails"] = content_details
             
         return await self._http.post(
-            f"/api/2/channels/{channel_id}/providers/{provider_id}/youtube/broadcast",
+            f"/channels/{channel_id}/providers/{provider_id}/youtube/broadcast",
             json=data
         )
 
@@ -28,7 +28,7 @@ class YouTubeAPI(APIGroup):
         if duration:
             data["duration_seconds"] = duration
         await self._http.post(
-            f"/api/2/channels/{channel_id}/youtube/{provider_id}/ban",
+            f"/channels/{channel_id}/youtube/{provider_id}/ban",
             json=data
         )
 
@@ -43,6 +43,6 @@ class KickAPI(APIGroup):
             "reason": reason
         }
         await self._http.post(
-            f"/api/2/channels/{channel_id}/kick/{provider_id}/ban",
+            f"/channels/{channel_id}/kick/{provider_id}/ban",
             json=data
         )

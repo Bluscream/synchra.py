@@ -6,8 +6,8 @@ class UserAPI(APIGroup):
 
     async def get_info(self) -> Dict[str, Any]:
         """Fetch basic profile info for the current user (ID, username, email)."""
-        return await self._http.get("/api/2/user")
+        return await self._http.get("/user")
 
     async def list_providers(self) -> List[Dict[str, Any]]:
         """Fetch all linked platform providers for the current user."""
-        return await self._http.get("/api/2/user/providers")
+        return await self._http.get("/user/providers")

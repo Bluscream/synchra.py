@@ -14,13 +14,13 @@ class KickAPI(APIGroup):
             "reason": reason
         }
         await self._http.post(
-            f"/api/2/channels/{channel_id}/kick/{provider_id}/ban",
+            f"/channels/{channel_id}/kick/{provider_id}/ban",
             json=data
         )
 
     async def unban_user(self, channel_id: UUID, provider_id: UUID, provider_viewer_id: str):
         """Unban a user from a Kick channel."""
         await self._http.delete(
-            f"/api/2/channels/{channel_id}/kick/{provider_id}/ban",
+            f"/channels/{channel_id}/kick/{provider_id}/ban",
             params={"provider_viewer_id": provider_viewer_id}
         )

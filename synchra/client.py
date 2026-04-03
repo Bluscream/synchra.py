@@ -21,7 +21,7 @@ class SynchraClient:
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         refresh_token: Optional[str] = None,
-        base_url: str = "https://api.synchra.net",
+        base_url: str = "https://api.synchra.net/api/2",
         ws_url: str = "wss://api.synchra.net/api/2/ws"
     ):
         self.auth = SynchraAuth(

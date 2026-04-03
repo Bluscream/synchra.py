@@ -86,10 +86,44 @@ python -m pytest tests/
 
 ## API Groups
 
-- **`client.channels`**: Main channel operations and provider listings.
+- **`client.channels`**: Main channel operations, provider listings, and **Invite/Access Management**.
 - **`client.twitch`**: Twitch-specific features (Ban, Unban, Raid, Shoutout, Emulation).
 - **`client.youtube`**: YouTube broadcasts and moderation.
 - **`client.kick`**: Kick-specific moderation tools.
+- **`client.user`**: Manage current user profile and linked accounts.
+- **`client.chat`**: Send and broadcast chat messages across platforms.
+
+## Supported Platforms
+
+- **Twitch**: Full moderation, raids, shoutouts, and EventSub emulation.
+- **YouTube**: Broadcast management and moderation.
+- **Kick**: Ban/Unban support.
+- **TikTok**: Stream monitoring (experimental).
+- **Discord/Spotify**: Integration support.
+
+## Invite & Access Management
+
+Synchra v2.0 supports sophisticated member management for your channels:
+
+```python
+from synchra.models.resources import AccessLevel
+
+# List current active invites
+invites = await client.channels.list_invites(channel_id)
+
+# Create a new Moderator invite
+new_invite = await client.channels.create_invite(channel_id, access_level=AccessLevel.MOD)
+print(f"Invite Link: {new_invite.invite_link}")
+
+# List users who already have access
+staff = await client.channels.list_user_access(channel_id)
+
+# Upgrade a user to Admin
+await client.channels.update_user_access(channel_id, staff[0].id, AccessLevel.ADMIN)
+
+# Revoke an invite
+await client.channels.delete_invite(channel_id, invites[0].id)
+```
 
 ## Documentation
 
