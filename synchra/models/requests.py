@@ -137,7 +137,7 @@ class CommandCreate(SynchraBaseModel):
     group_name: str | None = Field('', title='Group Name')
     active_mode: str | None = Field('always', title='Active Mode')
     enabled: bool | None = Field(True, title='Enabled')
-    access_level: AccessLevel | None = Field(AccessLevel.GUEST, title='AccessLevel')
+    access_level: AccessLevel | None = Field(AccessLevel.PUBLIC, title='AccessLevel')
     providers: list[Literal['all'] | Provider] | None = Field(['all'], title='Provider')
 
 class CommandUpdate(SynchraBaseModel):

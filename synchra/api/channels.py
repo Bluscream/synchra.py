@@ -4,7 +4,7 @@ from uuid import UUID
 from .base import APIGroup
 from ..models import (
     ChannelRecord, 
-    # ChannelProvider, # This might be in platforms/twitch.py or similar, or just ChannelRecord
+    ChannelProvider, 
     ActivityRecord,
     PageCursorChannel,
     PageCursorActivity,
@@ -109,7 +109,7 @@ class ChannelsAPI(APIGroup):
         params = {"cursor": cursor} if cursor else {}
         return await self._get_list(f"/channels/{channel_id}/user-invites", ChannelUserInviteRecord, params=params)
 
-    async def create_invite(self, channel_id: UUID, access_level: AccessLevel = AccessLevel.USER) -> ChannelUserInviteRecord:
+    async def create_invite(self, channel_id: UUID, access_level: AccessLevel = AccessLevel.SUB) -> ChannelUserInviteRecord:
         """
         Generate a new invite link with specific permissions.
         

@@ -1,16 +1,17 @@
 from enum import Enum, IntEnum
 from typing import Literal
 from pydantic import RootModel, Field
+from .base import SynchraBaseModel
 
 class AccessLevel(IntEnum):
-    GUEST = 0
-    SUB = 1
-    VIP = 2
-    MOD = 7
-    EDITOR = 100
-    ADMIN = 200
-    OWNER = 500
-    GLOBAL_ADMIN = 1000
+    PUBLIC = 0        # Label: Anyone, Permissions: []
+    SUB = 1           # Label: Sub, Permissions: []
+    VIP = 2           # Label: VIP, Permissions: []
+    MOD = 7           # Label: Mod, Permissions: [Read Activity Feed, Use moderation tools]
+    EDITOR = 100      # Label: Editor, Permissions: [Manage Commands, Timers, Filters, Quotes, Point Settings, Giveaways, Viewer Queue, Stream Widgets, Update Title, Run Ads, Read Stats]
+    ADMIN = 200       # Label: Admin, Permissions: [Manage Integrations, Manage User Access]
+    OWNER = 500       # Label: Owner, Permissions: []
+    GLOBAL_ADMIN = 1000 # Internal developer level
 
 class Provider(Enum):
     twitch = 'twitch'
@@ -221,9 +222,6 @@ class CountCurrency(Enum):
 class Feature(Enum):
     channel_viewer_extra_stats = 'channel_viewer_extra_stats'
 
-class Subscription(Enum):
-    pro_plus = 'pro_plus'
-
 class AlertAction(Enum):
     reload = 'reload'
     mute = 'mute'
@@ -233,3 +231,6 @@ class AlertAction(Enum):
     play_next = 'playNext'
     skip = 'skip'
 
+class Error(SynchraBaseModel):
+    type: str = Field(..., title='Type')
+    message: str = Field(..., title='Message')
