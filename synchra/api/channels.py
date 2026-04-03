@@ -3,14 +3,14 @@ from uuid import UUID
 
 from .base import APIGroup
 from ..models.resources import (
-    Channel, 
+    ChannelRecord, 
     ChannelProvider, 
-    Activity,
+    ActivityRecord,
     PageCursorChannel,
     PageCursorActivity,
-    ChannelUserAccessLevel,
-    ChannelUserAccessLevelWithUser,
-    ChannelUserInvite,
+    ChannelUserAccessRecord,
+    ChannelUserAccessRecord,
+    ChannelUserInviteRecord,
     AccessLevel
 )
 
@@ -25,7 +25,7 @@ class ChannelsAPI(APIGroup):
         provider_channel_name: Optional[str] = None,
         cursor: Optional[str] = None,
         per_page: int = 25
-    ) -> List[Channel]:
+    ) -> List[ChannelRecord]:
         """List and filter channels accessible to the user."""
         params = {
             "name": name,
@@ -37,19 +37,19 @@ class ChannelsAPI(APIGroup):
         }
         # Filter out None values
         params = {k: v for k, v in params.items() if v is not None}
-        return await self._get_list("/channels", Channel, params=params)
+        return await self._get_list("/channels", ChannelRecord, params=params)
 
-    async def create(self, display_name: str, show_on_landing_page: bool = True) -> Channel:
+    async def create(self, display_name: str, show_on_landing_page: bool = True) -> ChannelRecord:
         """Create a new channel."""
         data = {
             "display_name": display_name,
             "show_on_landing_page": show_on_landing_page
         }
-        return await self._http.post("/channels", json=data, response_model=Channel)
+        return await self._http.post("/channels", json=data, response_model=ChannelRecord)
 
-    async def get(self, channel_id: UUID) -> Channel:
+    async def get(self, channel_id: UUID) -> ChannelRecord:
         """Get details for a specific channel."""
-        return await self._http.get(f"/channels/{channel_id}", response_model=Channel)
+        return await self._http.get(f"/channels/{channel_id}", response_model=ChannelRecord)
 
     async def delete(self, channel_id: UUID) -> None:
         """Delete a channel."""
@@ -64,7 +64,7 @@ class ChannelsAPI(APIGroup):
         """
         return await self._get_list(f"/channels/{channel_id}/providers", ChannelProvider)
 
-    async def list_activities(self, channel_id: UUID, limit: int = 100, offset: int = 0) -> List[Activity]:
+    async def list_activities(self, channel_id: UUID, limit: int = 100, offset: int = 0) -> List[ActivityRecord]:
         """
         List past activities/events (subs, tips, follows) associated with this channel.
         
@@ -74,9 +74,9 @@ class ChannelsAPI(APIGroup):
             offset: Number of items to skip.
         """
         params = {"limit": limit, "offset": offset}
-        return await self._get_list(f"/channels/{channel_id}/activities", Activity, params=params)
+        return await self._get_list(f"/channels/{channel_id}/activities", ActivityRecord, params=params)
 
-    async def list_user_access(self, channel_id: UUID, cursor: Optional[str] = None) -> List[ChannelUserAccessLevelWithUser]:
+    async def list_user_access(self, channel_id: UUID, cursor: Optional[str] = None) -> List[ChannelUserAccessRecord]:
         """
         List all users who currently have permissions for this channel.
         
@@ -85,9 +85,9 @@ class ChannelsAPI(APIGroup):
             cursor: Optional pagination cursor for large lists.
         """
         params = {"cursor": cursor} if cursor else {}
-        return await self._get_list(f"/channels/{channel_id}/users-access", ChannelUserAccessLevelWithUser, params=params)
+        return await self._get_list(f"/channels/{channel_id}/users-access", ChannelUserAccessRecord, params=params)
 
-    async def update_user_access(self, channel_id: UUID, access_id: UUID, access_level: AccessLevel) -> ChannelUserAccessLevel:
+    async def update_user_access(self, channel_id: UUID, access_id: UUID, access_level: AccessLevel) -> ChannelUserAccessRecord:
         """
         Update the permission level of a specific user on a channel.
         
@@ -97,9 +97,9 @@ class ChannelsAPI(APIGroup):
             access_level: The new AccessLevel (MOD, EDITOR, ADMIN, etc.).
         """
         data = {"access_level": access_level}
-        return await self._http.put(f"/channels/{channel_id}/users-access/{access_id}", json=data, response_model=ChannelUserAccessLevel)
+        return await self._http.put(f"/channels/{channel_id}/users-access/{access_id}", json=data, response_model=ChannelUserAccessRecord)
 
-    async def list_invites(self, channel_id: UUID, cursor: Optional[str] = None) -> List[ChannelUserInvite]:
+    async def list_invites(self, channel_id: UUID, cursor: Optional[str] = None) -> List[ChannelUserInviteRecord]:
         """
         Retrieve all active, pending user invite links for this channel.
         
@@ -108,9 +108,9 @@ class ChannelsAPI(APIGroup):
             cursor: Optional pagination cursor for large lists.
         """
         params = {"cursor": cursor} if cursor else {}
-        return await self._get_list(f"/channels/{channel_id}/user-invites", ChannelUserInvite, params=params)
+        return await self._get_list(f"/channels/{channel_id}/user-invites", ChannelUserInviteRecord, params=params)
 
-    async def create_invite(self, channel_id: UUID, access_level: AccessLevel = AccessLevel.USER) -> ChannelUserInvite:
+    async def create_invite(self, channel_id: UUID, access_level: AccessLevel = AccessLevel.USER) -> ChannelUserInviteRecord:
         """
         Generate a new invite link with specific permissions.
         
@@ -119,7 +119,7 @@ class ChannelsAPI(APIGroup):
             access_level: The default AccessLevel for whoever joins via this link.
         """
         data = {"access_level": access_level}
-        return await self._http.post(f"/channels/{channel_id}/user-invites", json=data, response_model=ChannelUserInvite)
+        return await self._http.post(f"/channels/{channel_id}/user-invites", json=data, response_model=ChannelUserInviteRecord)
 
     async def delete_invite(self, channel_id: UUID, invite_id: UUID) -> None:
         """

@@ -9,7 +9,7 @@ import aiohttp
 from pydantic import BaseModel
 
 from .http import SynchraAuth
-from .models.resources import Activity
+from .models.resources import ActivityRecord
 
 logger = logging.getLogger("synchra.ws")
 

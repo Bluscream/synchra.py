@@ -13,7 +13,7 @@ def _make_provider(provider_name: str, **overrides) -> ChannelProvider:
         "provider": Provider(provider_name),
         "provider_channel_id": "ch-123",
         "provider_channel_name": "test_channel",
-        "provider_channel_display_name": "Test Channel",
+        "provider_channel_display_name": "Test ChannelRecord",
         "scope": "chat:write",
         "stream_title": None,
         "stream_category": None,

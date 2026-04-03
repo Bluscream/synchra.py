@@ -1,7 +1,7 @@
 import pytest
 from uuid import uuid4
 from synchra.api.channels import ChannelsAPI
-from synchra.models.resources import Channel
+from synchra.models.resources import ChannelRecord
 
 @pytest.mark.asyncio
 async def test_list_channels(http_client, mock_aioresponse):
@@ -9,7 +9,7 @@ async def test_list_channels(http_client, mock_aioresponse):
     mock_data = {
         "records": [{
             "id": channel_id,
-            "display_name": "Test Channel",
+            "display_name": "Test ChannelRecord",
             "created_at": "2026-04-02T10:50:00Z",
             "subscription": None,
             "features": ["channel_viewer_extra_stats"]
@@ -25,15 +25,15 @@ async def test_list_channels(http_client, mock_aioresponse):
     channels = await api.list()
     
     assert len(channels) == 1
-    # Note: Records might be a generated class like Record7 which matches Channel's structure
-    assert channels[0].display_name == "Test Channel"
+    # Note: Records might be a generated class like Record7 which matches ChannelRecord's structure
+    assert channels[0].display_name == "Test ChannelRecord"
 
 @pytest.mark.asyncio
 async def test_create_channel(http_client, mock_aioresponse):
     channel_id = str(uuid4())
     mock_data = {
         "id": channel_id,
-        "display_name": "New Channel",
+        "display_name": "New ChannelRecord",
         "created_at": "2026-04-02T10:55:00Z",
         "subscription": None,
         "features": []
@@ -42,9 +42,9 @@ async def test_create_channel(http_client, mock_aioresponse):
     mock_aioresponse.post("https://api.synchra.net/api/2/channels", status=201, payload=mock_data)
     
     api = ChannelsAPI(http_client)
-    channel = await api.create(display_name="New Channel")
+    channel = await api.create(display_name="New ChannelRecord")
     
     assert channel.id == UUID(channel_id)
-    assert channel.display_name == "New Channel"
+    assert channel.display_name == "New ChannelRecord"
 
 from uuid import UUID
