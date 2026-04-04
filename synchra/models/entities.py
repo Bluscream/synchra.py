@@ -385,11 +385,11 @@ class GiveawayEntry(SynchraBaseModel):
 class User(SynchraBaseModel):
     id: UUID = Field(..., title='Id')
     username: str = Field(..., title='Username')
-    email: str | None = Field(..., title='Email')
+    email: str | None = Field(None, title='Email')
     display_name: str = Field(..., title='Display Name')
-    created_at: AwareDatetime = Field(..., title='Created At')
+    created_at: AwareDatetime | None = Field(None, title='Created At')
     updated_at: AwareDatetime | None = Field(None, title='Updated At')
-    is_active: bool = Field(..., title='Is Active')
+    is_active: bool | None = Field(True, title='Is Active')
     default_channel_id: UUID | None = Field(None, title='Default ChannelRecord Id')
 
 class UserAccessLevel(SynchraBaseModel):
