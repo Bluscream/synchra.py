@@ -74,7 +74,7 @@ class SynchraAuth:
 
 class HTTPClient:
     """Low-level HTTP client for Synchra API."""
-    def __init__(self, auth: SynchraAuth, base_url: str = "https://api.synchra.net"):
+    def __init__(self, auth: SynchraAuth, base_url: str = "https://api.synchra.net/api/2"):
         self.auth = auth
         self.base_url = base_url.rstrip("/")
         self._session: Optional[aiohttp.ClientSession] = None
