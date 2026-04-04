@@ -71,9 +71,9 @@ async def test_send_message_all_broadcasts_to_non_tiktok(http_client, mock_aiore
         providers=[twitch_provider, youtube_provider, tiktok_provider],
     )
 
-    assert result["success"] == 2
-    assert result["failed"] == 0
-    assert result["errors"] == []
+    assert result.success == 2
+    assert result.failed == 0
+    assert result.errors == []
 
 
 @pytest.mark.asyncio
@@ -87,9 +87,9 @@ async def test_send_message_all_tiktok_only_channel(http_client, mock_aiorespons
         providers=[_make_provider("tiktok")],
     )
 
-    assert result["success"] == 0
-    assert result["failed"] == 0
-    assert result["errors"] == []
+    assert result.success == 0
+    assert result.failed == 0
+    assert result.errors == []
 
 
 @pytest.mark.asyncio
@@ -118,7 +118,7 @@ async def test_send_message_all_partial_failure(http_client, mock_aioresponse):
         providers=[twitch_provider, kick_provider],
     )
 
-    assert result["success"] == 1
-    assert result["failed"] == 1
-    assert len(result["errors"]) == 1
-    assert isinstance(result["errors"][0]["platform"], str)
+    assert result.success == 1
+    assert result.failed == 1
+    assert len(result.errors) == 1
+    assert isinstance(result.errors[0].platform, str)

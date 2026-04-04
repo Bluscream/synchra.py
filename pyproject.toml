@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synchra.py"
-version = "0.2.3"
+version = "0.2.5"
 description = "A modern, async-first Python SDK for the Synchra API v2.0."
 readme = "README.md"
 license = {text = "MIT"}
@@ -15,7 +15,7 @@ authors = [
 requires-python = ">=3.9"
 dependencies = [
     "aiohttp>=3.9.0",
-    "pydantic>=2.5.0,<2.11",
+    "pydantic>=2.5.0,<2.11", # we need this for red-discordbot
     "websockets>=12.0"
 ]
 
