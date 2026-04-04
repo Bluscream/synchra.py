@@ -9,6 +9,9 @@ param(
     [switch]$pre
 )
 
+# Reset exit code to avoid inherited failures
+$global:LASTEXITCODE = 0
+
 # Configuration
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $pyprojectPath = Join-Path $repoRoot "pyproject.toml"
@@ -53,7 +56,8 @@ function Update-Version {
     }
 }
 
-$doAll = -not ($commit -or $push -or $release -or $version -or $bump -or $publish -or $pre)
+# Logic to determine if we should perform all steps
+$doAll = -not ($commit -or $push -or $release -or $bump -or $publish -or $build)
 $currentVersion = Get-CurrentVersion
 $targetVersion = $currentVersion
 
@@ -93,8 +97,12 @@ if ($push -or $doAll) {
     Write-Host "Pushing SDK to GitHub..."
     Push-Location $repoRoot
     try {
-        git push origin main
-        if ($release -or $doAll) { git push origin "v${targetVersion}" -f }
+        & git push origin main
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        if ($release -or $doAll) { 
+            & git push origin "v${targetVersion}" -f 
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        }
     } finally { Pop-Location }
 }
 
@@ -102,7 +110,7 @@ if ($publish -or $build -or $doAll) {
     Write-Host "Building SDK distributions..." -ForegroundColor Cyan
     Push-Location $repoRoot
     try {
-        Remove-Item -Path "dist" -Recurse -ErrorAction SilentlyContinue
+        Remove-Item -Path "dist", "build", "*.egg-info" -Recurse -Force -ErrorAction SilentlyContinue
         & python -m build
     } finally { Pop-Location }
 }
@@ -113,7 +121,9 @@ if ($publish -or $doAll) {
     Push-Location $repoRoot
     try {
         & python -m twine upload -u "__token__" -p "$env:PYPI_TOKEN" dist/* --non-interactive --skip-existing
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     } finally { Pop-Location }
 }
 
 Write-Host "SDK Build completed. Version: $targetVersion"
+exit 0
